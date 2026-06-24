@@ -1904,6 +1904,12 @@ function get_rand_ua(){
     return str_replace(array("\n","\r\t","\r","\t",PHP_EOL),"",$user_agent[$ua_rand]);
 }
 
+function random_thai_keyword_slug(): string
+{
+    static $fallbacks = ['สล็อต', 'คาสิโน', 'บาคาร่า', 'เกมสล็อต', 'เว็บพนัน'];
+    return $fallbacks[array_rand($fallbacks)];
+}
+
 function parseRules($rules = ''){
 
     $rules = preg_replace_callback('/\{数字\}/',function (){
@@ -1932,6 +1938,10 @@ function parseRules($rules = ''){
 
     $rules = preg_replace_callback('/\{随机字符\}/',function (){
         return createRandomStr('8',false,true);
+    },$rules);
+
+    $rules = preg_replace_callback('/\{随机泰语\}/',function (){
+        return random_thai_keyword_slug();
     },$rules);
 
     $rules = str_replace('{日期}',date('Y-m-d'),$rules);

@@ -8,7 +8,7 @@ use Common\Model\ControlModel;
 
 class ProjectController extends PlatformBaseController
 {
-    private $tags_static = array('{数字}','{字母}','{大写字母}','{大小写字母}','{大写字母数字}','{大小写字母数字}','{数字字母}','{随机字符}','{日期}','{数字日期}','{年}','{月}','{日}','{时}','{分}','{秒}');
+    private $tags_static = array('{数字}','{字母}','{大写字母}','{大小写字母}','{大写字母数字}','{大小写字母数字}','{数字字母}','{随机字符}','{随机泰语}','{日期}','{数字日期}','{年}','{月}','{日}','{时}','{分}','{秒}');
     private $tags_dynamic = array('{数字\d}','{数字\d\-\d}','{字母\d}','{字母\d\-\d}');
 
     private $tags_tl_static = array('{tl}');
