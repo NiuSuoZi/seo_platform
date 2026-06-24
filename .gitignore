@@ -1,0 +1,10 @@
+.idea
+*.log
+/runtime/Data/*
+/runtime/Logs/*
+/runtime/Temp/*
+/runtime/Cache/*
+/runtime/uploads/keyword/*
+/application/Common/Conf/config.php
+/application/Common/Conf/db.php
+/application/Common/Conf/cache.php

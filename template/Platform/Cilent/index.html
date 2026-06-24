@@ -1,0 +1,75 @@
+<extend name="Public:base"/>
+<block name="title">首页代码劫持生成</block>
+<block name="content">
+    <div class="page-header">
+        <h1> <i class="fa fa-cog icon-test"></i>&nbsp;客户端管理 &gt; 首页代码劫持生成</h1>
+    </div>
+    <div class="col-xs-12">
+            <div class="alert alert-info" role="alert">输入目标站点URL，待程序自动生成相关关键词及描述和跳转JS！</div>
+            <form class="form-inline" action="{:U('Admin/Cilent/index')}" method="post" role="form" id="form_type">
+                <div style="" class="form-group">
+                <select name="robot_type" title="选择关键词组">
+                    <foreach name="data" item="vo" key="k">
+                       <option value="{$data.$k.keywords_gid}">{$data.$k.keywords_name}</option>
+                    </foreach>
+                </select>
+                </div>
+                <div style="width: 80%;" class="form-group">
+                    <input type="text" name="robot_url" id="robot_url" style="width: 100%;height:31px;text-align: center" aria-label="..." value="<?php if(!empty($_POST['robot_url'])){echo htmlspecialchars($_POST['robot_url']);}?>" placeholder="输入URL..." title="输入URL模拟">
+                </div>
+                <div class="form-group">
+                     <select name="robot_model" title="选择模拟模式">
+                        <option value="0">六合彩描述</option>
+                        <option value="1">时时彩描述</option>
+                     </select>
+                </div>
+                <button title="开始模拟" type="submit" class="btn btn-small btn-primary" style="height: 30px;line-height:1px">快速生成</button>
+            </form>
+            <br/>
+                <textarea class="form-control resizable processed" rows="30" readonly>11</textarea>
+    </div>
+</block>
+<block name="js">
+    <script>
+        // 添加菜单
+        function add(){
+            $("input[name='title'],input[name='name']").val('');
+            $("input[name='pid']").val(0);
+            $('#bjy-add').modal('show');
+        }
+
+        // 添加子菜单
+        function add_child(obj){
+            var ruleId=$(obj).attr('ruleId');
+            $("input[name='pid']").val(ruleId);
+            $("input[name='title']").val('');
+            $("input[name='name']").val('');
+            $('#bjy-add').modal('show');
+        }
+
+        // 修改菜单
+        function edit(obj){
+            var ruleId=$(obj).attr('ruleId');
+            var ruletitle=$(obj).attr('ruletitle');
+            var ruleName=$(obj).attr('ruleName');
+            $("input[name='id']").val(ruleId);
+            $("input[name='title']").val(ruletitle);
+            $("input[name='name']").val(ruleName);
+            $('#bjy-edit').modal('show');
+        }
+        var Expression=/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+        var objExp=new RegExp(Expression);
+
+        $("form").submit(function(e){
+            var input_text = $('#robot_url').val();
+            if($('#robot_url').val() ==+ ''){
+                alert('输入URL后进行模拟!');
+                return false;
+            }else if(objExp.test(input_text) != true){
+                alert('请检查是否输入正确的URL!!');
+                return false;
+            }
+        });
+    </script>
+</block>
+</block>

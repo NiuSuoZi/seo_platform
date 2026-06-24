@@ -1,0 +1,85 @@
+<extend name="Public:base"/>
+<block name="title">模板管理- 查看模板库</block>
+<block name="content">
+    <div class="page-header"><h1> 模板管理 &gt; 查看模板库</h1></div>
+    <div class="col-xs-12">
+        <div class="tabbable">
+            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+                <li class="active"><a href="#home" data-toggle="tab">模板库</a></li>
+                <li><a href="javascript:;" onclick="add()">添加模板</a></li>
+                <li><a href="javascript:;" onclick="clearCache()">刷新缓存</a></li>
+            </ul>
+            <div class="tabbable">
+                <div class="tab-content">
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <th>模板名称</th>
+                            <th>文件大小</th>
+                            <th>最后更新</th>
+                            <th>操作</th>
+                        </tr>
+                        <?php if(!empty($data)) : ?>
+                        <?php foreach($data as $key=>$value) : ?>
+                        <tr>
+                            <td><?php echo($data[$key]['name']);?></td>
+                            <td><?php echo($data[$key]['size']);?></td>
+                            <td><?php echo(word_time($data[$key]['LastUp']));?></td>
+                            <td><a class="blue" href="javascript:;" data-href='<?php echo(U("Platform/project/templates_view?name="));?><?php echo($data[$key]["name"]);?>&type=<?php echo($data[$key]["type"]);?>' data-tpl-name="<?php echo($data[$key]['name']);?>" data-tpl-type="<?php echo($data[$key]['type']);?>" name="View"><i class="ace-icon fa fa-search-plus bigger-130"></i></a></td>
+<!--                            <td><a class="btn-xs btn-primary" data-tpl-name="<?php echo($data[$key]['name']);?>" data-tpl-type="<?php echo($data[$key]['type']);?>" name="View" href="javascript:void(0);">View</a></td>-->
+                        </tr>
+                        <?php endforeach;?>
+                        <?php else:?>
+                        <td colspan="6" class="center"><b class="red">模板库为空：请确认内容端 attach/templates/thniu/ 已上传，并在服务器执行 php attach/scripts/deploy_th_locale.php，然后在 Platform 点「刷新缓存」</b></td>
+                        <?php endif;?>
+                    </table>
+                    <nav style="text-align: center">
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</block>
+<block name="js">
+    <script>
+        // 查看链接
+        $("a[name='View']").click(function(){
+            href = $(this).attr('data-href');
+            tpl_name = $(this).attr('data-tpl-name');
+            layer.open({
+                type: 2,
+                title: '在线查看【' + tpl_name + '】模板信息',
+                shadeClose: true,
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['70%', '70%'],
+                content: href,
+                end:function(){
+                    window.location.reload();
+                }
+            });
+        });
+
+        // 添加菜单
+        function add() {
+            layer.open({
+                type: 2,
+                title: '在线模板编辑器',
+                shadeClose: true,
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['70%', '70%'],
+                content: '{:U("Platform/Project/templates_add")}'
+            });
+        }
+
+        function clearCache(){
+            $.get('{:U("Platform/Project/templates_list?action=clearCache")}',function(res){
+                alert('成功清除');
+                window.location.reload();
+            })
+        }
+
+        // 修改菜单
+    </script>
+</block>

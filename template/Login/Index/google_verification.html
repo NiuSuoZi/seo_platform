@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>OTP 验证 - SEO Work Platform System V 4.2.1</title>
+    <meta name="keyword" content="seo工作平台,seo Platform,黑帽seo,白帽seo,灰帽seo" />
+    <meta name="description" content="适用于网站优化工作人员" />
+    <meta name="author" content="X37 Team Inc." />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!--/Style-CSS -->
+    <logincss />
+    <!--//Style-CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/layui@2.6.8/dist/css/layui.css"/>
+    <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>
+</head>
+
+<body>
+
+<!-- form section start -->
+<section class="w3l-hotair-form">
+    <h1>OTP 验证</h1>
+    <div class="container">
+        <!-- /form -->
+        <div class="workinghny-form-grid">
+            <div class="main-hotair">
+                <div class="content-wthree">
+                    <h2>请输入口令</h2>
+                    <form action="" method="post" id="form_login" action="{:U('login/index/ga_verify')}">
+                        <input type="text" class="text" name="username" id="loginName" value="<?php echo($login_uns);?>" disabled />
+                        <input type="number" class="password" name="ga_code" id="loginPwd" placeholder="请输入动态验证码" maxlength="6" required="" autofocus>
+                        <button class="btn" type="submit">VERIFY</button>
+                        {__TOKEN__}
+                    </form>
+                </div>
+                <div class="w3l_form align-self">
+                    <div class="left_grid_info">
+                        <img src="./public/statics/login/images/bg.png" alt="" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- //form -->
+    </div>
+    <!-- copyright-->
+    <div class="copyright text-center">
+        <p class="copy-footer-29">© 2023 Report Login Form. All rights reserved </p>
+    </div>
+    <!-- //copyright-->
+</section>
+<!-- //form section start -->
+<script type="text/javascript">
+    $('form').submit(function(event) {
+        event.preventDefault();
+        var google_code = $("input[name='ga_code']").val();
+        if(google_code.length !== 6){
+            layer.msg('验证码填写错误，请检查后重试!',{icon:2,time:750});
+            return false;
+        }
+
+        verfiy = {ga_code:google_code};
+
+        $.post("{:U('Login/index/ga_verify')}", verfiy, function(data, textStatus, xhr) {
+            if(data.code === 404){
+                layer.msg(data.msg, {icon: 2,time:1000});
+                return false;
+            }
+
+            if(data.code === 200){
+                layer.msg(data.msg, {icon: 1,time:2000},function(){
+                    window.location.href = data.redirect;
+                });
+            }
+        });
+    });
+    </script>
+</body>
+
+<script src="https://unpkg.com/layui@2.6.8/dist/layui.js"></script>
+</html>
+
+

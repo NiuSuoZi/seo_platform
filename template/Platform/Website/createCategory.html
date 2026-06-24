@@ -1,0 +1,79 @@
+<link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/layui/2.6.8/css/layui.min.css"/>
+<div class="layui-container" style="margin-top: 20px; max-width: 600px; background: #f9f9f9; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <form class="layui-form" action="" method="post">
+        <!-- 第一行 多列布局 -->
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label" style="font-weight: bold;">分类名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="category_name" required lay-verify="required" placeholder="分类 3-25个字符之间"
+                               autocomplete="off" class="layui-input" style="border: 1px solid #ddd; border-radius: 4px; padding: 10px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第四行（提交按钮） -->
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="formDemo"
+                                style="background-color: #5FB878; border-radius: 4px; padding: 10px 20px; font-size: 16px; line-height: 1.2; display: inline-flex; align-items: center; justify-content: center;">
+                            创建分类
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+    .layui-form-label {
+        font-size: 14px;
+        color: #333;
+        padding: 9px 15px;
+    }
+
+    .layui-input {
+        font-size: 14px;
+        color: #555;
+    }
+
+    .layui-btn {
+        transition: all 0.3s;
+    }
+
+    .layui-btn:hover {
+        background-color: #4e9e6f;
+    }
+</style>
+<script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/layui/2.6.8/layui.min.js"></script>
+<script>
+
+    layui.use('form', function () {
+        var form = layui.form;
+        var layer = layui.layer;
+        // 监听提交
+        form.on('submit(formDemo)', function (data) {
+
+            $.post('{:U("platform/website/createCategory")}',data.field,function(response){
+                if(response.code === 200){
+                    layer.msg(response.message);
+                    setTimeout(function() {
+                        var index = parent.layer.getFrameIndex(window.name); // 获取当前弹层的索引
+                        parent.layer.close(index); // 关闭当前弹层
+                        parent.location.reload(); // 刷新父页面
+                    }, 3000); // 延迟3秒（3000毫秒）
+                }else{
+                    layer.msg(response.message);
+                }
+            })
+            return false;
+        });
+    });
+</script>

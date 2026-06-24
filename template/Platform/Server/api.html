@@ -1,0 +1,106 @@
+<extend name="Public:base"/>
+<block name="title">接口管理</block>
+<block name="content">
+    <div class="page-header">
+        <h1><i class="fa fa-server icon-test"></i> 服务端管理&gt; 接口管理</h1>
+    </div>
+    <div class="col-xs-12">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+            <li class="active"> <a href="#home" data-toggle="tab">接口列表</a></li>
+            <li><a href="javascript:;" id="add_api">新增接口</a></li>
+        </ul>
+        <div class="tabbable">
+            <div class="tab-content">
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                    <tr>
+                        <th>接口ID</th>
+                        <th>接口名称</th>
+                        <th>部署域名</th>
+                        <th>创建时间</th>
+                        <th>随机新闻请求数</th>
+                        <th>随机关键词请求数</th>
+                        <th>随机标题请求数</th>
+                        <th>缓存文件总数</th>
+                        <th>Access Token</th>
+                        <th>接口操作</th>
+                    </tr>
+                    <?php if(!empty($data)) : ?>
+                      <?php foreach($data as $key=>$value) : ?>
+                    <tr>
+                        <td><?php echo($data[$key]['ids']);?></td>
+                        <td><?php echo($data[$key]['name']);?></td>
+                        <td><a href="javascript:;"><?php echo($data[$key]['domain']);?></a></td>
+                        <td><?php echo(word_time($data[$key]['create_times']));?></td>
+                        <td><b class="red"><?php echo($data[$key]['request_random_article_count']);?></b></td>
+                        <td><b class="red"><?php echo($data[$key]['request_keywords_count']);?></b></td>
+                        <td><b class="red"><?php echo($data[$key]['request_random_news_title_count']);?></b></td>
+                        <td>0</td>
+                        <td><code><?php echo($data[$key]['access_token']);?></code></td>
+                        <td><?php if($data[$key]['status'] == 0):?><a href="javascript:;" data-role-ids="<?php echo($data[$key]['ids']);?>" name="start-interface"><span class="label label-success">启用接口<span></a><?php else:?><a href="javascript:;" data-role-ids="<?php echo($data[$key]['ids']);?>" name="stop-interface"><span class="label label-danger">停用接口</span></a><?php endif;?></td>
+                </tr>
+                <?php endforeach;?>
+                <?php else:?>
+                        <td colspan="9" class="center"><b class="red">暂时没有接口信息!</b></td>
+                <?php endif;?>
+                    </tbody>
+                </table>
+                <nav style="text-align: center;">
+                    {$page}
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="add_window" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times;</button>
+                    <h4 class="modal-title" id="myModalLabel">新增接口</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="bjy-form" class="form-inline" action="{:U('platform/server/api','action=add')}" method="post">
+                        <table class="table table-striped table-bordered table-hover table-condensed">
+                            <tbody>
+                            <tr>
+                                <th width="12%">接口名：</th>
+                                <td> <input class="input-medium" type="text" name="name" placeholder="接口名称，不可重复" required="1" /></td>
+                            </tr>
+                            <tr>
+                                <th width="15%">访问域名：</th>
+                                <td> <input class="input-medium" type="text" name="domain" placeholder="接口部署域名" required="2" /></td>
+                                <input type="hidden" name="access_token" value="<?php echo(md5(time() . U('platform/server/api','action=add')));?>" />
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td> <input class="btn btn-success" type="submit" value="新增" /></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script type="text/javascript">
+    $(function(){
+      $("#add_api").click(function(event) {
+            $("#add_window").modal('show');
+      });
+
+      // 启用接口
+    $("a[name='start-interface']").click(function(event) {
+        var ids = $(this).attr('data-role-ids');
+        $.post("{:U('platform/server/api','action=select_domain')}", {interfaces_id: ids}, function(data, textStatus, xhr) {
+            console.log(data);
+        });
+    });
+      // 停用接口
+       $("a[name='stop-interface']").click(function(event) {
+        alert("停用接口!");
+    });
+        });
+    </script>
+</block>

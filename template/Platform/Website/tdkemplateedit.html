@@ -1,0 +1,189 @@
+<link rel="stylesheet" href="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/layui/2.6.8/css/layui.min.css"/>
+<div class="layui-container" style="margin-top: 20px;">
+    <form class="layui-form" action="" method="post">
+        <!-- 第一行 多列布局 -->
+        <div class="layui-row layui-col-space15">
+            <!-- 第二行 多列布局 -->
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">站群模板</label>
+                        <div class="layui-input-block">
+                            <select name="category_template" lay-verify="required">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-col-md4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">站群关键词</label>
+                        <div class="layui-input-block">
+                            <select name="category_keyword" lay-verify="required">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-col-md4">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">站群文章源</label>
+                        <div class="layui-input-block">
+                            <select name="category_content" lay-verify="required">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">跳转JS</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="ad_url" required lay-verify="required" placeholder="请输入跳转JS"
+                                   autocomplete="off" class="layui-input" value="{$WebsiteProfileData.ad_url}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第三行（多行文本框） -->
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">统计代码</label>
+                        <div class="layui-input-block">
+                            <textarea name="analytics_custom" placeholder="请输入插入统计代码 或其他跟踪代码"
+                                      class="layui-textarea" style="height: 25%;">{$WebsiteProfileData.analytics_custom}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第四行（提交按钮） -->
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="formDemo">提交</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </form>
+</div>
+<script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/layui/2.6.8/layui.min.js"></script>
+<script src="./public/statics/xm-select/xm-select.js"></script>
+<script>
+
+    async function fetchAndRenderData() {
+        try {
+            // 获取数据
+            const response = await $.get('{:U("Platform/ProjectApi/mix?type=tl")}');
+
+            // 解析数据
+            const contentData = JSON.parse(response.data.content);
+            const templateData = response.data.template;
+            const keywordData = response.data.keyword;
+
+            console.log(contentData);
+            console.log(templateData);
+            console.log(keywordData);
+
+            // 渲染 article 选择框
+            contentData.article.forEach(item => {
+                $("select[name='category_content']").append(`<option value="${item.table}">${item.table}</option>`);
+            });
+
+            // 渲染 keyword 选择框
+            keywordData.forEach(item => {
+                $("select[name='category_keyword']").append(`<option value="${item.value}">${item.name}</option>`);
+            });
+
+            // 渲染 template 选择框
+            templateData.forEach(item => {
+                $("select[name='category_template']").append(`<option value="${item.value}">${item.name}</option>`);
+            });
+
+            // 重新渲染表单
+            layui.form.render('select');
+
+            // 设置默认选项并确保表单重新渲染
+            setTimeout(() => {
+                $("select[name='category_content']").val("{$WebsiteProfileData.category_content}");
+                layui.form.render('select');
+                $("select[name='category_keyword']").val("{$WebsiteProfileData.category_keyword}");
+                layui.form.render('select');
+                $("select[name='category_template']").val("{$WebsiteProfileData.category_template}");
+                layui.form.render('select');
+
+                // 再次渲染表单，确保选中项生效
+            }, 100);
+        } catch (error) {
+            console.error("Error fetching or rendering data:", error);
+        }
+    }
+
+    // 调用异步函数
+    fetchAndRenderData();
+
+    // $.get('{:U("Platform/ProjectApi/mix?type=tl")}',function (response){
+    //     const contentData = JSON.parse(response.data.content);
+    //     const templateData = response.data.template;
+    //     const keywordData = response.data.keyword;
+    //
+    //     console.log(contentData);
+    //     console.log(templateData);
+    //     console.log(keywordData);
+    //
+    //     // 渲染 article 选择框
+    //     $.each(contentData.article, function(index, item) {
+    //         $("select[name='category_content']").append('<option value="' + item.table + '">' + item.table + '</option>');
+    //     });
+    //
+    //
+    //     $.each(keywordData, function(index, item) {
+    //         $("select[name='category_keyword']").append('<option value="' + item.value + '">' + item.name + '</option>');
+    //     });
+    //
+    //     $.each(templateData, function(index, item) {
+    //         $("select[name='category_template']").append('<option value="' + item.value + '">' + item.name + '</option>');
+    //     });
+    //
+    //     layui.form.render('select');
+    //
+    //
+    //     $("select[name='category_content']").val("{$WebsiteProfileData.category_content}");
+    //     $("select[name='category_keyword']").val("{$WebsiteProfileData.category_keyword}");
+    //     $("select[name='category_template']").val("{$WebsiteProfileData.category_template}");
+    //
+    //
+    //     layui.form.render('select');
+    // })
+
+
+
+    layui.use('form', function () {
+        var form = layui.form;
+        var layer = layui.layer;
+        // 监听提交
+        form.on('submit(formDemo)', function (data) {
+
+            $.post('{:U("platform/website/tdkemplateadd")}',data.field,function(response){
+                if(response.code === 200){
+                    layer.msg(response.message);
+                    setTimeout(function() {
+                        var index = parent.layer.getFrameIndex(window.name); // 获取当前弹层的索引
+                        parent.layer.close(index); // 关闭当前弹层
+                        parent.location.reload(); // 刷新父页面
+                    }, 3000); // 延迟3秒（3000毫秒）
+                }else{
+                    layer.msg(response.message);
+                }
+            })
+            return false;
+        });
+    });
+</script>

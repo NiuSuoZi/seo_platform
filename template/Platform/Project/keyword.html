@@ -1,0 +1,235 @@
+<extend name="Public:base"/>
+<block name="title">关键词组管理</block>
+<block name="content">
+    <div class="page-header">
+        <h1> 关键词组管理 &gt; 关键词组管理</h1>
+    </div>
+    <div class="col-xs-12">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+            <li class="active"> <a href="#home" data-toggle="tab">关键词列表</a></li>
+            <li><a href="#home" onclick="add()">添加词库</a></li>
+<!--            <li><a href="javascript:;" id="clearCache">更新缓存</a></li>-->
+        </ul>
+        <div class="tabbable">
+            <div class="tab-content">
+                <table class="table table-striped table-bordered table-hover table-condensed">
+                    <tbody>
+                    <tr>
+                        <th>词库标识</th>
+                        <th>词总数</th>
+                        <th>模型</th>
+                        <th>操作</th>
+                    </tr>
+                    <?php if(!empty($datas) && is_array($datas)) :
+                        foreach($datas as $key=>$val):
+                    ?>
+                    <tr>
+                        <td><?php echo ($datas[$key]["table"]);?></td>
+                        <td><?php echo ($datas[$key]["count"]);?></td>
+                        <td><?php if(strpos($datas[$key]["table"], 'seo_tl') !== false):?>
+                            <span class="red">TL 模型</span>
+                            <?php else:?>
+                            <span class="green">普通模型</span>
+                            <?php endif;?>
+                        </td>
+                        <td><a href="javascript:void(0);" name="showData" data-name="<?php echo ($datas[$key]['table']);?>" class="btn-xs btn-primary">查看數據</a> <a href="javascript:void(0);" name="addData" data-name="<?php echo ($datas[$key]['table']);?>" class="btn-xs btn-primary">追加数据</a> <a href="javascript:void(0);" name="clearCache" class="btn-xs btn-danger">清理缓存</a></td>
+                    </tr>
+                    <?php endforeach;?>
+                    <?php else:?>
+                    <td colspan="4" class="center"><b class="red">无法链接内容端词库，请检查配置文件~</b></td>
+                    <?php endif;?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="bjy-add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times;</button>
+                    <h4 class="modal-title" id="myModalLabel"> 添加词库</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="upload" class="form-inline" action="{:U('Platform/Project/keyword?action=upload')}" method="post">
+                        <table class="table table-striped table-bordered table-hover table-condensed">
+                            <tbody>
+                            <tr>
+                                <th width="15%">提示</th>
+                                <td>上传必须将文本转换为UTF-8编码格式，否则会出现乱码。</td>
+                            </tr>
+                            <tr>
+                                <th width="15%">词库标识：</th>
+                                <td> <input class="input-medium" type="text" name="kw_name" placeholder="seo_" /></td>
+                            </tr>
+                            <tr>
+                                <th width="15%">词库文件：</th>
+                                <td>
+                                    <input type="file" id="keyword_files" name="kw_file" accept="text/plain"/>
+                                </td>`
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td> <input class="btn btn-success" type="submit" value="创建词库" /></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script>
+        var queue = "";
+        var Interval; // obj
+        function v_load() {
+            $.ajax({
+                url: '{:U("Platform/Project/keyword?action=queue")}',
+                data: {queue_id: queue},
+                type: 'POST',
+                success: function (res) {
+                    if(res.message === 'ok'){
+                        clearInterval(Interval); // 销毁定时器
+                        layer.closeAll();
+                        layer.msg("导入数据成功，正在跳转...",{icon:1,time:2000},function(){
+                            window.location.reload();
+                        });
+                    }else{
+                        $("#queue_log").empty();
+                        $("#queue_log").val(res.message);
+                        $("#queue_log").scrollTop($("#queue_log")[0].scrollHeight);
+                    }
+                }
+
+        });
+        }
+
+
+        $('a[name="showData"]').click(function () {
+            $.ajax({
+                url : '{:U("Platform/Project/keyword?action=query")}',
+                type: 'post',
+                data : {table_name:$(this).attr('data-name')},
+                success: function (data) {
+                    if(data.code === 200){
+                        layer.open({
+                            type: 1 //Page层类型
+                            ,area: ['650px', '650px']
+                            ,title: '查看' + data.table + '數據表情況'
+                            ,shade: 0.6 //遮罩透明度
+                            ,maxmin: false //允许全屏最小化
+                            ,anim: 1 //0-6的动画形式，-1不开启
+                            ,content: '<textarea id="datas" style="height: 600px; width:630px;font-size:16px;" readonly disabled></textarea>'
+                        });
+                        var contents = "";
+                        for (list=0;list<data.data.length;list++){
+                            contents += data.data[list] + "\n";
+                        }
+
+                        $('#datas').html(contents);
+                    }else{
+                        alert('獲取數據表出錯，請檢查配置。');
+                    }
+                }
+
+            });
+        })
+
+
+
+        // 更新缓存
+
+        $('a[name="clearCache"]').click(function () {
+            layer.confirm('如果你的数据错误，请点击“确定”!', {
+                btn: ['确定清理', '点错了'] //按钮
+                ,title: '是否需要清理缓存?',
+                icon:3
+            }, function () {
+                $.ajax({
+                    url: '{:U("Platform/Project/keyword?action=ClearCache")}',
+                    type: 'post',
+                    data: {action: 'clearAll'},
+                    success: function (data) {
+                        if (data.code !== 200) {
+                            layer.msg(data.msg, {time: 500,icon: 1});
+                        } else {
+                            layer.msg(data.msg, {time: 500}, function () {
+                                window.location.reload();
+                            });
+                        }
+                    }
+                });
+            }, function () {
+                layer.msg('取消清理缓存', {
+                    icon: 0,
+                    time: 500
+                });
+            });
+        });
+
+        $('#upload').submit(function(event) {
+            event.preventDefault();
+            kw_name = $("input[name='kw_name']").val();
+            data = new FormData();
+            file = $("#keyword_files").prop('files');
+            preg_str = /^[a-zA-Z0-9]+$/;
+            if(kw_name == ''){
+                layer.msg('词库标识不能为空！',{icon:2,time:650});
+                return false;
+            }
+
+            if(!preg_str.test(kw_name)){
+                layer.msg('词库标识命名错误！',{icon:2,time:650});
+                return false;
+            }
+
+            if(file.length === 0 || file[0].size < -1){
+                layer.msg('请选择文件后在提交！',{icon:2,time:650});
+                return false;
+            }
+
+            data.append('kw_name',kw_name);
+            data.append('kw_files',file[0]);
+
+            $.ajax({
+                url:'{:U("Platform/Project/keyword?action=upload")}',
+                type: 'POST',
+                data : data,
+                processData: false,
+                contentType: false,
+                success : function(result){
+                    if(result.code === 404){
+                        layer.msg(result.msg,{icon:2,time:650});
+                        return false;
+                    }
+
+                    if(result.code === 200){
+                        layer.msg(result.msg,{icon:1,time:1000});
+
+                        queue = result.data;
+                        $('#bjy-add').modal('hide'); // 关闭导入词库
+
+                        layer.open({
+                            type: 1 //Page层类型
+                            ,area: ['650px', '650px']
+                            ,title: '查看导入进度，请勿关闭页面！'
+                            ,shade: 0.6 //遮罩透明度
+                            ,maxmin: true //允许全屏最小化
+                            ,anim: 1 //0-6的动画形式，-1不开启
+                            ,content: '<textarea id="queue_log" style="height: 600px; width:630px;" readonly>等待队列日志...</textarea>'
+                        });
+
+                        Interval = setInterval(v_load, 1000);
+
+                    }
+                }
+
+            })
+        });
+        // 添加菜单
+        function add(){
+            $('#bjy-add').modal('show');
+        }
+    </script></block>

@@ -1,0 +1,71 @@
+<extend name="Public:base"/>
+<block name="title">Javascript 加密 or 解密工具</block>
+<block name="content">
+    <style type="text/css">
+        .leftBtn{margin-left: 6.0%;}
+    </style>
+    <div class="page-header">
+        <h1> <i class="fa fa-cog icon-test"></i>&nbsp;辅助工具 &gt; Javascript 加密 or 解密工具</h1>
+    </div>
+    <div class="col-xs-12">
+        <div class="form-group">
+            <textarea class="form-control" name="source_code" rows="21" placeholder="这里写需要加密或解密的JS代码 支持 eval windows 等等混淆及其他加密和美化"></textarea>
+        </div>
+        <div class="form-group form-inline">
+                <button type="button" class="btn btn-primary btn-lg" onclick="_run_(this)" value="pack">加密(<u>E</u>ncrypt)</button>
+                <button type="button" class="leftBtn btn btn-primary btn-lg" onclick="_run_(this)" value="unpack">解密(<u>D</u>ecrypt)</button>
+                <button type="button" class="leftBtn btn btn-primary btn-lg" onclick="_run_(this)" value="beauty">美化(<u>B</u>eutify)</button>
+                <button type="button" class="leftBtn btn btn-primary btn-lg" onclick="_run_(this)" value="purify">压缩(<u>P</u>ack)</button>
+                <button type="button" class="leftBtn btn btn-primary btn-lg" onclick="_run_(this)" value="uglify">混淆(<u>U</u>glify)</button>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script type="text/javascript">
+
+        function _run_(obj){
+            
+            if($("textarea[name='source_code']").val() == '')
+              {
+                    alert('请输入代码后重试.');
+                    return false;
+              }
+           
+            var operate = ['pack','unpack','beauty','purify','uglify'];
+            // 防止内存溢出 还原php的 in_array 函数
+                if(isInArray(operate,obj.value))
+                {
+                    var source_code_s = $("textarea[name='source_code']").val();
+                    var actions = obj.value;
+                    $.ajax({
+                        url: "{:U('Platform/Tools/decode')}",
+                        type: 'POST',
+                        data: {action:actions,code:source_code_s},
+                        dataType : 'json',
+                        success : function(data){
+                            if(data.status){
+                                $("textarea[name='source_code']").val(data.text);
+                            }else{
+                                $("textarea[name='source_code']").val(data.msg);
+                            }
+                        },
+                        error : function(){
+                            alert("网络错误,请重试!!");
+                            return;
+                        }
+
+                    });
+                    
+                }
+        }
+        // 
+        function isInArray(arr,value){
+            for(var i = 0; i < arr.length; i++){
+                if(value === arr[i]){
+                    return true;
+            }
+        }
+        return false;
+    }
+    </script>
+</block>

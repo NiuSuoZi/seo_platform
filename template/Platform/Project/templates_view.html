@@ -1,0 +1,140 @@
+<link href="__ADMIN_ACEADMIN__/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet"
+      href="__ADMIN_ACEADMIN__/css/font-awesome.min.css" />
+<link rel="stylesheet"
+      href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" />
+<!--[if IE 7]>
+<link rel="stylesheet" href="__ADMIN_ACEADMIN__/css/font-awesome-ie7.min.css" />
+<![endif]-->
+<link rel="stylesheet" href="__PUBLIC__/statics/bootstrap-3.3.5/css/bootstrap-multiselect.min.css" />
+
+<link rel="stylesheet" href="__ADMIN_ACEADMIN__/css/ace.min.css" />
+<link rel="stylesheet" href="__ADMIN_ACEADMIN__/css/ace-skins.min.css"/>
+<!--[if lte IE 8]>
+<link rel="stylesheet" href="__ADMIN_ACEADMIN__/css/ace-ie.min.css" />
+<![endif]-->
+<!--[if lt IE 9]>
+<script src="__ADMIN_ACEADMIN__/js/html5shiv.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/respond.min.js"></script>
+
+<![endif]-->
+<jquery/>
+<layer />
+<codemirrorcss/>
+<codemirrorjs/>
+            <div class="col-xs-12">
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inconsolata">
+                <style>
+                    .CodeMirror {
+                        font-family: Inconsolata, monospace;
+                        font-size: 20px;
+                    }
+                </style>
+                <ul class="list-inline" style="text-align:center;">
+                    <li><a href="javascript:;" id="preview" title="预览">预览</a></li>
+                    <li><a href="javascript:;" id="save" title="本地保存">保存修改</a></li>
+                    <li><a href="javascript:;" title="模板标签助手">模板标签助手</a></li>
+                    <li><a href="javascript:;" title="自动识别标签">自动识别标签</a></li>
+                    <li><a href="javascript:;" title="布局检测">布局检测</a></li>
+                    <li><a href="javascript:;" id="code_format" title="代码格式化(Beta)">代码格式化(Beta)</a></li>
+                </ul>
+                <div class="col-xs-offset-1 form-inline">
+                    <div style="width: 90%;" class="form-group">
+                    <input readonly type="text" name="template_name" id="template_name" style="width: 100%;text-align: center" value="<?php echo($filename); ?>" placeholder="请输入模板名字..." title="请输入模板名字 "/>
+                    </div>
+                </div>
+                <br/>
+                <textarea id="source" class="form-control resizable processed" rows="30"><?php echo($content); ?></textarea>
+            </div>
+            <script>
+                var editor = CodeMirror.fromTextArea(document.getElementById("source"), {
+                    lineNumbers: true,
+                    styleActiveLine: true,
+                    matchBrackets: true,
+                    theme : 'yonce',
+                    extraKeys: { "Tab": "autocomplete" },
+                });
+
+                editor.setSize('auto', '680px');
+                editor.setOption('lineWrapping', true);
+
+
+                function getSelectedRange() {
+                    return { from: editor.getCursor(true), to: editor.getCursor(false) };
+                }
+
+
+                $("#code_format").click(function(){
+                    // 代码格式化
+                    var range = getSelectedRange();
+                    editor.autoFormatRange(range.from, range.to);
+                });
+
+                // 保存
+
+                $("#save").click(function(){
+                    console.log('保存模板');
+                    content = editor.getValue();
+                    tname = "{$filename}";
+                    type = "{$type}";
+
+                    data = {
+                        content : content,
+                        name : tname,
+                        type : type
+                    };
+
+                    $.ajax({
+                        url:'{:U("platform/project/templates_view?action=edit")}',
+                        type:'POST',
+                        data:data,
+                        success:function (data) {
+                            if(data.code === 404){
+                                layer.msg(data.msg,{icon:0,time:1000});
+                            }
+
+                            if(data.code === 200){
+                                layer.msg(data.msg,{icon:1,time:1500},function(){
+                                    window.close();
+                                });
+                            }
+                        }
+                    })
+
+                });
+
+
+                // 新窗口预览代码
+                $("#preview").click(function(){
+                    var source = editor.getValue();
+                    var winname = window.open('', "_blank", '');
+                    winname.document.open('text/html', 'replace');
+                    winname.opener = null; // 防止代码对论谈页面修改
+                    winname.document.write(source);
+                    winname.document.close();
+                });
+
+
+                function htmlspecialchars(str) {
+                    var s = "";
+                    if (str.length == 0) return "";
+                    for   (var i=0; i<str.length; i++)
+                    {
+                        switch (str.substr(i,1))
+                        {
+                            case "<": s += "&lt;"; break;
+                            case ">": s += "&gt;"; break;
+                            case "&": s += "&amp;"; break;
+                            case " ":
+                                if(str.substr(i + 1, 1) == " "){
+                                    s += " &nbsp;";
+                                    i++;
+                                } else s += " ";
+                                break;
+                            case "\"": s += "&quot;"; break;
+                            default: s += str.substr(i,1); break;
+                        }
+                    }
+                    return s;
+                }
+            </script>

@@ -1,0 +1,67 @@
+<extend name="Public:base"/>
+
+<block name="title"><?php $types = $_GET['types']; if($types == '') : echo ('全部列表'); ?><?php else:?><?php echo($list[$types]); ?><?php endif;?> - 今日蜘蛛爬行统计</block>
+<block name="content">
+    <div class="page-header">
+        <h1> 首页&gt; 劫持总汇</h1>
+    </div>
+    <div class="col-xs-12">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+            <?php $types = $_GET['types'];?>
+            <li id="all_list"> <a href="{:U('Platform/Spider/information')}">站点列表</a></li>
+        </ul>
+        <style type="text/css">
+            .center{
+                text-align: center;
+            }
+        </style>
+        <div class="tabbable">
+            <div class="tab-content">
+                <table class="table table-bordered table-hover">
+                        <tr>
+                            <th>站点序列</th>
+                            <th>站点域名</th>
+                            <th>Sogou蜘蛛</th>
+                            <th>360蜘蛛</th>
+                            <th>Baidu蜘蛛</th>
+                            <th>Bing蜘蛛</th>
+                            <th>神马蜘蛛</th>
+                            <th>谷歌蜘蛛</th>
+                            <th>劫持类型</th>
+                            <th>爬行总数</th>
+                            <th>首次爬行时间</th>
+                            <th>最后爬行时间</th>
+                        </tr>
+                        <?php if(!empty($data)) : ?>
+                        <?php foreach($data as $key=>$value) : ?>
+                       <tr>
+                            <td><?php echo($data[$key]['id']);?></td>
+                            <td><a href="javascript:;" name="domain"><?php echo($data[$key]['domain']);?></a></td>
+                            <td><?php echo($data[$key]['sogou_count']);?></td>
+                            <td><?php echo($data[$key]['360_count']);?></td>
+                            <td><?php echo($data[$key]['baidu_count']);?></td>
+                            <td><?php echo($data[$key]['bing_count']);?></td>
+                            <td><?php echo($data[$key]['yisou_count']);?></td>
+                           <td><?php echo($data[$key]['google_count']);?></td>
+                           <td><?php echo($data[$key]['types']);?></td>
+                           <td><?php echo($data[$key]['sogou_count'] + $data[$key]['baidu_count'] + $data[$key]['bing_count'] + $data[$key]['yisou_count'] + $data[$key]['google_count'] + $data[$key]['360_count']);?></td>
+                            <td><b class="red"><?php echo(word_time($data[$key]['create_times']));?></b></td>
+                           <td><b class="red"><?php echo(word_time($data[$key]['last_times']));?></b></td>
+                        </tr>
+                        <?php endforeach;?>
+                        <?php else:?>
+                            <td colspan="12" class="center"><b class="red">未找到相关数据!</b></td>
+                        <?php endif;?>
+                </table>
+                <nav style="text-align: center">
+                {$page}
+                </nav>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script type="text/javascript">
+            
+    </script>
+</block>

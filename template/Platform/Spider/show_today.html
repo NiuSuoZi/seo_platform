@@ -1,0 +1,89 @@
+<extend name="Public:base"/>
+<block name="title"><?php $types = $_GET['types']; if($types == '') : echo ('全部列表'); ?><?php else:?><?php echo($list[$types]); ?><?php endif;?> - 今日蜘蛛爬行统计</block>
+<block name="content">
+    <div class="page-header">
+        <h1> 首页&gt; 今日蜘蛛爬行统计</h1>
+    </div>
+    <div class="col-xs-12">
+<!--            <div class="input-group">-->
+<!--                        <span class="input-group-addon">-->
+<!--							<i class="ace-icon fa fa-check"></i>-->
+<!--						</span>-->
+
+<!--            <input type="text" class="form-control search-query" placeholder="Type your query" />-->
+<!--            <span class="input-group-btn">-->
+<!--							<button type="button" class="btn btn-inverse btn-white">-->
+<!--								<span class="ace-icon fa fa-search icon-on-right bigger-110"></span>-->
+<!--									Search-->
+<!--								</button>-->
+<!--						</span>-->
+<!--            </div>-->
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+            <?php $types = $_GET['types'];?>
+            <li id="all_list" <?php if($types == ''): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_today')}">全部列表</a></li>
+            <li id="baiduspider" <?php if($types == 1): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_today','types=1')}">百度蜘蛛</a></li>
+            <li id="sogouspider" <?php if($types == 2): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_today','types=2')}">搜狗蜘蛛</a></li>
+            <li id="haosouspider" <?php if($types == 3): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_today','types=3')}">360蜘蛛</a></li>
+            <li id="bingspider" <?php if($types == 4): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_today','types=4')}">必应蜘蛛</a></li>
+            <li id="googlespider" <?php if($types == 5): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_today','types=5')}">谷歌蜘蛛</a></li>
+            <li id="smspider" <?php if($types == 6): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_today','types=6')}">神马蜘蛛</a></li>
+            <li id="yandexspider" <?php if($types == 7): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_today','types=7')}">Yandex蜘蛛</a></li>
+            <li id="coccocspider" <?php if($types == 8): echo("class=\"active\""); ?>  <?php endif;?>> <a href="{:U('Platform/Spider/show_today','types=8')}">Coccoc蜘蛛</a></li>
+            <li id="naverspider" <?php if($types == 9): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_today','types=9')}">Naver蜘蛛</a></li>
+        </ul>
+        <style type="text/css">
+            .center{
+                text-align: center;
+            }
+            .glist{
+                border-right: 15px;
+                line-height: 15px;
+                display: inline-block;
+            }
+        </style>
+        <div class="tabbable">
+            <div class="tab-content">
+                <table class="table table-bordered table-hover">
+                        <tr>
+                            <th>爬行域名</th>
+                            <th>爬行 User-Agent</th>
+                            <th>爬行URI</th>
+                            <th>入站来源</th>
+                            <th>来源 IP</th>
+                            <th>首次爬行</th>
+                            <th>爬行时间</th>
+                        </tr>
+                        <?php if(!empty($data)) : ?>
+                        <?php foreach($data as $key=>$value) : ?>
+                       <tr>
+                            <td><a href="javascript:;" name="domain"><?php echo($data[$key]['spider_domain']);?></a></td>
+                            <td><b class="blue"><?php echo(get_spider($data[$key]['spider_types']));?></b></td>
+                            <td><a href="javascript:;" title="点击访问" name="urls"><?php echo($data[$key]['spider_url']);?></a></td>
+                            <td><?php echo($data[$key]['types']);?></td>
+                           <td>
+                               <?php if (empty($data[$key]['ip_source'])): ?>
+                               空
+                               <?php else: ?>
+                               <code><?php echo(extractIpAddresses($data[$key]['ip_source'])); ?></code>
+                               <?php endif; ?>
+                           </td>
+                           <td><?php if($data[$key]['spider_first'] == 1): ?><b class="red">是</b><?php else:?><b class="green">否</b><?php endif;?></td>
+                            <td><b class="grey"><?php echo(word_time($data[$key]['spider_times']));?></b></td>
+                        </tr>
+                        <?php endforeach;?>
+                        <?php else:?>
+                            <td colspan="7" class="center"><b class="red">未找到相关数据!</b></td>
+                        <?php endif;?>
+                </table>
+                <nav style="text-align: center">
+                {$page}
+                </nav>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script type="text/javascript">
+            
+    </script>
+</block>

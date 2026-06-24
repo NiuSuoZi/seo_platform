@@ -1,0 +1,101 @@
+<extend name="Public:base"/>
+<block name="title">服务端管理</block>
+<block name="content">
+    <div class="page-header">
+        <h1> <i class="fa fa-cog icon-test"></i>服务端管理&nbsp; &gt; &gt;服务端获取</h1>
+    </div>
+    <div class="col-xs-12">
+        <div class="row">
+            <div class="form-inline">
+                <p>IIS 6导出命令：</p><br/>
+                <pre>iiscnfg /export /f c:\finance\finance.xml /sp /lm/w3svc/2 /children /inherited</pre>
+                <br/>
+                <p>IIS 7~10导出命令：</p><br/>
+                <pre>%windir%\system32\inetsrv\AppCmd.exe LIST SITE /config /XML > C:\iisappcmdexport.xml</pre>
+                <br/>
+                <p>待导入的<u>X</u>ML配置：</p>            
+                <br/>
+                <textarea class="form-control" rows="10" placeholder="直接粘贴XML配置文件..."></textarea>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script>
+        // 添加菜单
+        function add(){
+            $("input[name='title'],input[name='name']").val('');
+            $("input[name='pid']").val(0);
+            $('#bjy-add').modal('show');
+        }
+
+        // 添加子菜单
+        function add_child(obj){
+            var ruleId=$(obj).attr('ruleId');
+            $("input[name='pid']").val(ruleId);
+            $("input[name='title']").val('');
+            $("input[name='name']").val('');
+            $('#bjy-add').modal('show');
+        }
+
+        // 修改菜单
+        function edit(obj){
+            var ruleId=$(obj).attr('ruleId');
+            var ruletitle=$(obj).attr('ruletitle');
+            var ruleName=$(obj).attr('ruleName');
+            $("input[name='id']").val(ruleId);
+            $("input[name='title']").val(ruletitle);
+            $("input[name='name']").val(ruleName);
+            $('#bjy-edit').modal('show');
+        }
+
+        var Expression=/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+        var objExp=new RegExp(Expression);
+
+        // htaccess 罩盖层
+        // 显示总共有多少域名
+        // #response_class
+        $("textarea[name='cipher']").keyup(function(event) {
+            var domin_list = $("textarea[name='cipher']").val();
+            if(domin_list !== '')
+            {
+                var _tmp_list = [];
+                var _tmp_list = domin_list.split("\n");
+                $("#response").css({"color":"green"});
+                $("#response").html("共检测到<b>" + _tmp_list.length + "</b>条数据");
+                $("#response_class").show();
+            }else{
+                $("#response").html("请输入域名");
+                $("#response").css({"color":"red"});
+            }
+
+        });
+
+        function show_model(){
+            var Model_off = true;
+            // 把域名列表转换成数组 回车符号分割
+            var domin_list = $("textarea[name='cipher']").val();
+            if(domin_list !== '')
+            {
+                var _tmp_list = [];
+                var _tmp_list = domin_list.split("\n");
+                for(i=0;i<_tmp_list.length;i++){
+                    if(objExp.test(_tmp_list[i]) != true){
+                        Model_off = false
+                        alert("域名列表中第" + [i+1] + "行不正确，请检测后重试!");
+                        // 增加textarea 错误高亮提示*
+                        break;
+                        return;
+                    }
+                }
+            }else{
+                alert('请导入域名后重试...');
+                return false;
+                Model_off = false;
+            }
+            if(Model_off){
+                $("#htaccess_setting").modal('show');
+            }
+        }
+    </script>
+</block>

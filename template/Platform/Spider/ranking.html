@@ -1,0 +1,70 @@
+<extend name="Public:base"/>
+<block name="title">蜘蛛爬行统计</block>
+<block name="content">
+    <div class="page-header">
+        <h1> 蜘蛛管理&gt; 今日蜘蛛爬行排行</h1>
+    </div>
+    <div class="col-xs-12">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue">
+            <li id="ranking" class="active"> <a href="{:U('Platform/Spider/show_yesterday')}">蜘蛛爬行统计</a></li>
+            <li id="cquery"> <a href="{:U('Platform/Spider/show_yesterday','types=1')}">分类查询</a></li>
+            <li id="more-query"> <a href="{:U('Platform/Spider/show_yesterday','types=2')}">更多数据查询</a></li>
+        </ul>
+        <div class="tabbable">
+            <div class="tab-content">
+                <table class="table table-bordered table-hover">
+                    <tr>
+                        <th>爬行域名</th>
+                        <th>爬行总数</th>
+                        <th>百度蜘蛛</th>
+                        <th>搜狗蜘蛛</th>
+                        <th>360蜘蛛</th>
+                        <th>必应蜘蛛</th>
+                        <th>谷歌蜘蛛</th>
+                        <th>最后爬行时间</th>
+                    </tr>
+                    <?php if(!empty($data)) : ?>
+                    <?php foreach($data as $key=>$value) : ?>
+                    <tr>
+                        <td><?php echo($data[$key]['pid']);?></td>
+                        <td><a href="javascript:;" name="domain"><?php echo($data[$key]['spider_domain']);?></a></td>
+                        <td><b class="blue"><?php echo(get_spider($data[$key]['spider_types']));?></b></td>
+                        <td><a href="javascript:;" title="点击访问" name="urls"><?php echo($data[$key]['spider_url']);?></a></td>
+                        <td><?php echo($data[$key]['spider_cached']);?></td>
+                        <td><?php echo($data[$key]['spider_kt']);?></td>
+                        <td><?php echo($data[$key]['types']);?></td>
+                        <td><b class="red"><?php echo(word_time($data[$key]['spider_times']));?></b></td>
+                    </tr>
+                    <?php endforeach;?>
+                    <?php else:?>
+                    <td colspan="8" class="center"><b class="red">未找到相关数据!</b></td>
+                    <?php endif;?>
+                    </tbody>
+                </table>
+                <nav style="text-align: center">
+                    {$page}
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="show-domain-info" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times;</button>
+                    <h4 class="modal-title" id="myModalLabel">域名信息</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script type="text/javascript">
+        $("a[name='domain']").click(function(event) {
+            $("#show-domain-info").modal('show');
+        });
+    </script>
+</block>

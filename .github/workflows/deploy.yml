@@ -1,0 +1,26 @@
+name: autodeploy
+
+on:
+  push:
+    branches:
+      - master  # 确保这里和你的 master 分支一致
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server via SSH/rsync
+        uses: easingthemes/ssh-deploy@v5.1.0
+        with:
+          # 🔴 注意：这里全部改成了 secrets.XXXX，去掉了双冒号
+          SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.SERVER_IP }}
+          REMOTE_USER: ${{ secrets.SERVER_USER }}
+          
+          SOURCE: "./"
+          TARGET: "/www/wwwroot/platform.microffice365.com" # 确保是你的宝塔/服务器路径
+          EXCLUDE: "/.git/, /.github/, /.user.ini"     # 已经帮你把 .user.ini 排除掉了

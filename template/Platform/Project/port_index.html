@@ -1,0 +1,295 @@
+<extend name="Public:base"/>
+<block name="title">Controll 管理 - 接口列表</block>
+<block name="content">
+    <div class="page-header"><h1> Controll 管理 &gt; 接口列表</h1></div>
+    <style>
+        .layui-form-label{
+            width: 100px;
+        }
+
+        .layui-input-inline {
+            width: 715px;
+        }
+        .layui-input-block{
+            width: 715px;
+        }
+        .message-tips{
+            margin-top: 5px;
+            display: block;
+            white-space:pre-wrap;
+            word-break: normal;
+        }
+        .message-bodys{
+            padding-left: 10px;
+        }
+        #create-controll {
+            overflow: auto;  /* 允许内容溢出时显示滚动条 */
+        }
+        .operate-menu {
+            min-width: 120px; /* 控制菜单宽度 */
+            padding: 5px 0;
+            border-radius: 4px; /* 圆角样式 */
+            box-shadow: none; /* 去除下拉阴影 */
+            border: 1px solid #ddd; /* 边框颜色 */
+        }
+
+        .operate-menu li a {
+            font-size: 12px; /* 调整字体大小 */
+            padding: 5px 10px; /* 调整内边距，适配小尺寸按钮 */
+            display: flex; /* 支持图标和文字对齐 */
+            align-items: center;
+        }
+
+        .operate-menu li a i {
+            margin-right: 6px; /* 图标与文字的间距 */
+            font-size: 12px; /* 缩小图标大小 */
+        }
+
+        .operate-menu .divider {
+            margin: 4px 0; /* 分割线间距 */
+            height: 1px;
+            background-color: #ddd;
+        }
+
+
+    </style>
+    <div class="col-xs-12">
+        <div class="tabbable">
+            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+                <li class="active"><a href="javascript:;" data-toggle="tab">接口列表</a></li>
+                <li><a href="javascript:;" onclick="add()">新增接口</a></li>
+            </ul>
+            <div class="tabbable">
+                <div class="tab-content">
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <th>绑定域名</th>
+                            <th>关键词组</th>
+                            <th>接口类型</th>
+                            <th>接口说明</th>
+                            <th>广告地址</th>
+                            <th>模板</th>
+                            <th>修改时间</th>
+                            <th>托管数量</th>
+                            <th>操作</th>
+                        </tr>
+                        <?php if(!empty($data)) : ?>
+                        <?php foreach($data as $key=>$value) : ?>
+                        <?php $_class = array('badge-pink','badge-purple','badge-yellow','badge-success','badge-inverse','badge-danger','badge-grey','');?>
+                        <?php $k_class = mt_rand(0,count($_class) - 1);?>
+                        <?php $_rand = array_rand($_class);?>
+                        <?php $kw = ($data[$key]['keyword'] !== null) ? explode(",", $data[$key]['keyword']) : null;
+                               $kw_count = ($kw !== null) ? count($kw) : 0; ?>
+                        <?php $template = unserialize($data[$key]['seo_option']);?>
+                        <?php $advert = unserialize($data[$key]['advert_option']);?>
+                        <tr>
+                            <!--<td><?php echo($data[$key]['id']);?></td>-->
+                            <!--                            <td><?php echo($data[$key]['name']);?></td>-->
+                            <td><code><?php echo($data[$key]['bind_domain']);?></code></td>
+                            <td><details>
+                                <summary>关联<span class="badge <?php echo($_class[$k_class]) ;?>"><?php echo($kw_count);?></span>个词组</summary>
+                                <ul>
+                                    <?php foreach($kw as $keys => $values) : ?>
+                                    <li><code><?php echo($values);?></code></li>
+                                    <?php endforeach;?>
+                                </ul>
+                            </details></td>
+                            <td><?php if($data[$key]['type'] == 0):?><span class="layui-badge layui-bg-cyan">普通类型</span><?php else:?><span class="layui-badge">TL 对应</span><?php endif;?></td>
+                            <td><?php echo($data[$key]['remark']);?></td>
+                            <td><?php if(empty($advert)):?>未设置<?php else:?><?php echo($advert['ad_js']);?><?php endif;?></td>
+                            <td>
+                                <?php $tpl = ($template['project_template'] !== null) ? explode(",", $template['project_template']) : null;
+                               $tpl_count = ($tpl !== null) ? count($tpl) : 0; ?>
+                                <details>
+                                    <summary>使用<span class="badge <?php echo($_class[$k_class]) ;?>"><?php echo($tpl_count);?></span>个模板</summary>
+                                    <ul>
+                                        <?php foreach($tpl as $mkey => $mvalues) : ?>
+                                        <li><code><?php echo($mvalues);?></code></li>
+                                        <?php endforeach;?>
+                                    </ul>
+                                </details>
+                            </td>                            <!--                            <td><?php echo($data[$key]['web_status']);?></td>-->
+                            <td><b class="red"><?php echo(word_time($data[$key]['update_time']));?></b></td>
+                            <td><a class="cache-total" href="javascript:;" data-control-clsid="{$data[$key]['clsid']}">0</a></td>
+                            <td>
+                                <div class="btn-group">
+                                    <!-- 更多按钮 -->
+                                    <button class="btn btn-xs btn-primary dropdown-toggle"
+                                            type="button"
+                                            data-toggle="dropdown"
+                                            aria-haspopup="true"
+                                            aria-expanded="false">
+                                        编辑/删除
+                                        <i class="ace-icon fa fa-caret-down"></i>
+                                    </button>
+                                    <!-- 下拉菜单 -->
+                                    <ul class="dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                                        <!-- 编辑选项 -->
+                                        <li>
+                                            <a href="{:U('Platform/Project/port_edit?cid=')}<?php echo($data[$key]['mid']); ?>"
+                                               id="edit-item"
+                                               data-control-mid="<?php echo($data[$key]['mid']); ?>">
+                                                <i class="ace-icon fa fa-pencil-alt"></i> 编辑
+                                            </a>
+                                        </li>
+                                        <!-- 更换接口域名 -->
+                                        <li>
+                                            <a href="javascript:;"
+                                               id="update-domain"
+                                               data-control-mid="<?php echo($data[$key]['mid']); ?>">
+                                                <i class="ace-icon fa fa-exchange-alt"></i> 更换接口域名
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <!-- 删除选项 -->
+                                        <li>
+                                            <a href="javascript:;"
+                                               id="delete-item"
+                                               data-control-mid="<?php echo($data[$key]['mid']); ?>"
+                                               class="text-danger">
+                                                <i class="ace-icon fa fa-trash-alt"></i> 删除
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach;?>
+                        <?php else:?>
+                        <td colspan="8" class="center"><b class="red">还未创建任何接口，请<a href="javascript:add();">创建</a>接口~</b></td>
+                        <?php endif;?>
+                    </table>
+                    <nav style="text-align: center">
+                        {$page}
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div id="create-controll" style="display: none;">
+            <div class="layui-form" style="padding-top: 35px;padding-left: 150px;">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">绑定域名</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="bind_domain" placeholder="添加需要绑定的域名，不需要携带协议" lay-verify="required|bind_domain" class="layui-input" id="validate-phone" style="width: 750px;">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">接口类型</label>
+                    <div class="layui-input-block">
+                        <select name="type" lay-verify="required" lay-reqText="请选择接口类型~">
+                            <option value=""></option>
+                            <option value="0">普通类型</option>
+                            <option value="1">TL 对应</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label">接口备注</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="remark" placeholder="接口备注" lay-verify="required" class="layui-input" style="width: 750px;">
+                        {__TOKEN__}
+                    </div>
+                </div>
+                <div class="layui-form-item" style="padding-top: 25px;padding-left: 150px;">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="demo-validate" style="width: 300px;">提交</button>
+                    </div>
+                </div>
+            </div>
+    </div>
+</block>
+
+<block name="js">
+   <script>
+
+       // $(".cache-total") 是包含多个 <td><a class="cache-total" href="javascript:;" data-control-clsid="<?php echo($data[$key]['mid']);?>">0</a></td>
+       // 现在循环 $(".cache-total") 后请求接口 使用 data-control-clsid 请求接口 如果$(".cache-total") 没有则不循环
+       // 确保 $(".cache-total") 元素存在
+       if ($(".cache-total").length > 0) {
+           $(".cache-total").each(function() {
+               // 获取 data-control-clsid 值
+               var controlClsid = $(this).data("control-clsid");
+               var $currentElement = $(this);
+
+               //  <td><span class="cache-total" href="javascript:;" data-control-clsid="{$data[$key]['clsid']}">0</span></td>
+
+               // 发送请求，使用控制 clsid
+               $.ajax({
+                   url: "{:U('platform/Project/port_index?info=getTotal&clsid=')}" + controlClsid, // 替换成你的 API 接口
+                   method: 'POST',
+                   data: {clsid: controlClsid},
+                   success: function (response) {
+                       let responseData = JSON.parse(response);
+                       $currentElement.text(responseData.total);
+                   },
+                   error: function (error) {
+                       // 错误处理
+                       console.error(error);
+                   }
+               });
+           });
+       } else {
+           console.log('没有找到 .cache-total 元素');
+       }
+
+       $("a[name='edit']").click(function (event) {
+           mid = $(this).attr('data-control-mid');
+           window.location.href = "{:U('Platform/Project/port_edit?cid=')}" + mid;
+       });
+
+       function add() {
+           layer.open({
+               type: 1, // page 层类型
+               area: ['1200px', '350px'],
+               title: '创建 Controll',
+               shade: 0.6, // 遮罩透明度
+               shadeClose: true, // 点击遮罩区域，关闭弹层
+               maxmin: true, // 允许全屏最小化
+               anim: 0, // 0-6 的动画形式，-1 不开启
+               skin: 'layui-layer-rim',  // 使用自定义皮肤
+               content: $('#create-controll')
+           });
+       }
+
+       layui.use(function () {
+           var $ = layui.$;
+           var form = layui.form;
+
+           form.verify({
+               bind_domain: function (value, item) {
+                   var regex = /^((?!https?:\/\/)[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/i;
+                   if (!regex.test(value)) {
+                       return '域名格式填写错误,该值不允许输入协议头和文件路径.';
+                   }
+               }
+           });
+
+           // 提交事件
+           form.on('submit(demo-validate)', function (data) {
+               var field = data.field; // 获取表单字段值
+               layer.load(5, {shade: [0.5, "#5588AA"]});
+               $.post("{:U('Platform/Project/port_create')}", field, function (data) {
+                   if (data.code === 404) {
+                       layer.closeAll("loading");
+                       layer.alert(data.data.msg, {
+                           title: '信息填写错误!'
+                       });
+                       return false;
+                   }
+
+                   if (data.code === 200) {
+                       layer.closeAll("loading");
+                       layer.msg(data.data.msg, {icon: 16, time: 3000}, function () {
+                           window.location.href = data.data.redirect;
+                       })
+                   }
+
+
+               })
+               return false; // 阻止默认 form 跳转
+           });
+       });
+   </script>
+</block>

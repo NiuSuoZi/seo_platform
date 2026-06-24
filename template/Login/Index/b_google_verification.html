@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <logincss />
+    <jquery />
+    <layer />
+    <title>Google 二次验证 - SEO Work Platform System V 3.0</title>
+    <meta name="keyword" content="seo工作平台,seo Platform,黑帽seo,白帽seo,灰帽seo" />
+    <meta name="description" content="适用于网站优化工作人员" />
+    <meta name="author" content="X37 Team Inc." />
+</head>
+<body>
+<div class="login-page bounce">
+    <div class="form">
+        <h3>两步验证 —— 请输入Google验证码</h3>
+        <hr />
+        <form class="login-form" method="POST" action="{:U('login/index/ga_verify')}">
+            <input
+                    type="text" name="code" placeholder="用户名"  value="<?php echo($login_uns);?>" disabled />
+            <input
+                type="password" name="ga_code" placeholder="验证码 Verify Code" />
+            {__TOKEN__} <br />
+            <button>
+                <b>Verify</b>
+            </button>
+        </form>
+        <p class="message"><a href="{:U('login/index/logout')}">注销登录</a> | <a href="javascript:;" onclick="alert('当前帐号无法找回！')">找回密码</a></p>
+        <p class="message">
+            Power by X37 Team Inc.</p>
+    </div>
+</div>
+<script type="text/javascript">
+        $('form').submit(function(event) {
+            event.preventDefault();
+            var google_code = $("input[name='ga_code']").val();
+            if(google_code.length !== 6){
+                layer.msg('验证码填写错误，请检查后重试!',{icon:2,time:750});
+                return false;
+            }
+
+            verfiy = {ga_code:google_code};
+
+            $.post("{:U('Login/index/ga_verify')}", verfiy, function(data, textStatus, xhr) {
+                if(data.code === 404){
+                    layer.msg(data.msg, {icon: 2,time:1000});
+                    return false;
+                }
+
+                if(data.code === 200){
+                    layer.msg(data.msg, {icon: 1,time:2000},function(){
+                        window.location.href = data.redirect;
+                    });
+                }
+            });
+        });
+</script>
+</body>
+</html>

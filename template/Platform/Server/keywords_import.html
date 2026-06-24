@@ -1,0 +1,172 @@
+<extend name="Public:base"/>
+<block name="title">IIS6 ReWirte2 站群劫持代码生成</block>
+<block name="content">
+    <div class="page-header">
+        <h1> <i class="fa fa-cog icon-test"></i>&nbsp;辅助工具 &gt; IIS6 rewrite2 站群劫持代码生成</h1>
+    </div>
+    <div class="col-xs-12 container">
+        <div class="col-xs-5" style="float: left;">
+            <div style="float: left;">
+                <div class="title"><p>域名列表:</p><br/></div>
+                <textarea name="cipher" class="form-control" rows="60" style="width: 410px;height: 500px;" id="a_source" placeholder="域名列表,一行表示一条域名"></textarea>
+            </div>
+        </div>
+        <div style="float: left;width: 136px;text-align: center;margin:30px 5px 0 5px">
+            <div class="OptDetail Button">
+                <button class="btn btn-primary" onclick="javascript:show_model();" style="margin:0 0 10px 0;"> 下一步 <i class="icon-chevron-right icon-white"></i></button>
+                <div id="response_class" style="display: none;">
+                    <p id="response">共检测到 0 条域名</p>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-xs-5" style="float: right;">
+            <div style="float: left;">
+                <div class="title"><p>生成结果:</p><br/></div>
+                <textarea name="message" rows="60" class="form-control" id="u_source" style="width: 410px;height: 500px;" class="text_source" readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加菜单模态框开始 -->
+    <div class="modal fade" id="htaccess_setting" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        生成选项
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="bjy-form" class="form-inline" action="{:U('Platform/Nav/add')}" method="post">
+                        <input type="hidden" name="pid" value="0">
+                        <table class="table table-striped table-bordered table-hover table-condensed">
+                            <tr>
+                                <th width="20%">服务端地址：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="name"> 快照劫持服务端
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>跳转地址：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="mca"> 页面跳转地址
+                                </td>
+                            </tr>
+                            <tr id="not_found_class" style="display: none;">
+                                <th>404劫持地址：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="ico">
+                                    404地址
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>类型管理：</th>
+                                <td>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="inlineCheckbox1" value="option1"> 360劫持
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="inlineCheckbox2" value="option2"> 搜狗劫持
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" id="inlineCheckbox3" value="option3"> 百度劫持
+                                    </label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <input class="btn btn-success" type="submit" value="急速生成">
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</block>
+<block name="js">
+    <script>
+        // 添加菜单
+        function add(){
+            $("input[name='title'],input[name='name']").val('');
+            $("input[name='pid']").val(0);
+            $('#bjy-add').modal('show');
+        }
+
+        // 添加子菜单
+        function add_child(obj){
+            var ruleId=$(obj).attr('ruleId');
+            $("input[name='pid']").val(ruleId);
+            $("input[name='title']").val('');
+            $("input[name='name']").val('');
+            $('#bjy-add').modal('show');
+        }
+
+        // 修改菜单
+        function edit(obj){
+            var ruleId=$(obj).attr('ruleId');
+            var ruletitle=$(obj).attr('ruletitle');
+            var ruleName=$(obj).attr('ruleName');
+            $("input[name='id']").val(ruleId);
+            $("input[name='title']").val(ruletitle);
+            $("input[name='name']").val(ruleName);
+            $('#bjy-edit').modal('show');
+        }
+
+        var Expression=/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+        var objExp=new RegExp(Expression);
+
+        // htaccess 罩盖层
+        // 显示总共有多少域名
+        // #response_class
+        $("textarea[name='cipher']").keyup(function(event) {
+            var domin_list = $("textarea[name='cipher']").val();
+            if(domin_list !== '')
+            {
+                var _tmp_list = [];
+                var _tmp_list = domin_list.split("\n");
+                $("#response").css({"color":"green"});
+                $("#response").html("共检测到<b>" + _tmp_list.length + "</b>条数据");
+                $("#response_class").show();
+            }else{
+                $("#response").html("请输入域名");
+                $("#response").css({"color":"red"});
+            }
+
+        });
+
+        function show_model(){
+            var Model_off = true;
+            // 把域名列表转换成数组 回车符号分割
+            var domin_list = $("textarea[name='cipher']").val();
+            if(domin_list !== '')
+            {
+                var _tmp_list = [];
+                var _tmp_list = domin_list.split("\n");
+                for(i=0;i<_tmp_list.length;i++){
+                    if(objExp.test(_tmp_list[i]) != true){
+                        Model_off = false
+                        alert("域名列表中第" + [i+1] + "行不正确，请检测后重试!");
+                        // 增加textarea 错误高亮提示*
+                        break;
+                        return;
+                    }
+                }
+            }else{
+                alert('请导入域名后重试...');
+                return false;
+                Model_off = false;
+            }
+            if(Model_off){
+                $("#htaccess_setting").modal('show');
+            }
+        }
+    </script>
+</block>

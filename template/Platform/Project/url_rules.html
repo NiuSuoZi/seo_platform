@@ -1,0 +1,463 @@
+<extend name="Public:base"/>
+<block name="title">项目管理 - URL 规则管理</block>
+<block name="content">
+    <div class="page-header"><h1> 项目管理 &gt; URL 规则管理</h1></div>
+    <div class="col-xs-12">
+        <div class="tabbable">
+            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+                <li class="active"><a href="#home" data-toggle="tab">规则列表</a></li>
+                <li><a href="javascript:;" onclick="add()">添加规则</a></li>
+            </ul>
+            <div class="tabbable">
+                <div class="tab-content">
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <th>规则 ID</th>
+                            <th>规则名称</th>
+                            <th>链接规则</th>
+                            <th>调用URL</th>
+                            <th>默认规则</th>
+                            <th>调用外链</th>
+                            <th>外链调用数量</th>
+                            <th>链接类型</th>
+                            <th>最后编辑时间</th>
+                            <th>操作</th>
+                        </tr>
+                        <?php if(!empty($data)) : ?>
+                        <?php foreach($data as $key=>$value) : ?>
+                        <?php $rule = unserialize($data[$key]['ur_content']);?>
+                        <?php $count_rules = count($rule);?>
+                        <tr>
+                            <td><?php echo($data[$key]['ur_id']);?></td>
+                            <td><?php echo($data[$key]['ur_name']);?></td>
+                            <td>
+                                <details>
+                                    <summary>一共有<b><?php echo($count_rules);?></b>条链接</summary>
+                                    <ul>
+                                        <?php foreach($rule as $keys => $values) : ?>
+                                        <li><?php echo($values);?></li>
+                                        <?php endforeach;?>
+                                    </ul>
+                                </details>
+                            </td>
+                            <td><code><?php allUrl();?>i/<?php echo($data[$key]['ur_alias']);?></code></td>
+                            <td><?php if($data[$key]['ur_default'] == 1): ?><b class="red">是</b><?php else:?><b class="green">否</b><?php endif;?></td>
+                            <td><?php if($data[$key]['ur_filnk_enable'] == 1): ?><b class="grey">是</b><?php else:?><b class="pink">否</b><?php endif;?></td>
+                            <td><?php echo($data[$key]['ur_flink_number']);?></td>
+                            <td><?php if($data[$key]['ur_type'] == 1): ?><b class="red">TL 类型</b><?php else:?><b class="green">普通类型</b><?php endif;?></td>
+                            <td><?php echo(word_time($data[$key]['ur_addtime']));?></td>
+                            <td><a class="btn-xs btn-primary" data-rule-id="<?php echo($data[$key]['ur_id']);?>" name="ViewRule" href="javascript:void(0);">View</a>&nbsp;<a class="btn-xs btn-danger" name="DeleteRule" data-rule-id="<?php echo($data[$key]['ur_id']);?>" href="javascript:void(0);">Delete</a></td>
+                        </tr>
+                        <?php endforeach;?>
+                        <?php else:?>
+                        <td colspan="10" class="center"><b class="red">暂时未添加任何规则~</b></td>
+                        <?php endif;?>
+                    </table>
+                    <nav style="text-align: center">
+                        {$page}
+                    </nav>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="bjy-add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times;</button>
+                        <h4 class="modal-title" id="myModalLabel"> 添加规则</h4></div>
+                    <div class="modal-body">
+                        <form id="add-form" class="form-inline" action="{:U('Platform/Proxy/url_rules?action=add')}" method="post">
+                            <table class="table table-striped table-bordered table-hover table-condensed">
+                                <tr>
+                                    <th width="15%">规则名称：</th>
+                                    <td><input class="input-medium" type="text" name="ur_name" style="width: 100%;" placeholder="规则名称"></td>
+                                </tr>
+                                <tr>
+                                    <th width="15%">规则类型：</th>
+                                    <td><select name="ur_type">
+                                        <option value="0" title="普通类型" selected>普通类型</option>
+                                        <option value="1" title="TL 对应">TL 对应</option>
+                                    </select></td>
+                                </tr>
+                                <tr style="display: none" name="show-from">
+                                    <th width="15%">TL 来源表：</th>
+                                    <td><select name="ur_from_table">
+                                    </select></td>
+                                </tr>
+
+                                <tr>
+                                    <th width="15%">HerfLang(hl)：</th>
+                                    <td>
+                                        <input class="input-medium" type="text" name="ur_hreflang" style="width: 100%;" placeholder="hreflang">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th width="17%">默认规则：</th>
+                                    <td width="50%">
+                                        <span class="inputword">是</span> <input class="xb-icheck" type="radio" name="ur_default"
+                                                                                value="1" checked="checked"> &emsp;&emsp; <span
+                                            class="inputword">否</span> <input class="xb-icheck" type="radio" name="ur_default"
+                                                                              value="0" checked>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th width="17%">是否调用外链：</th>
+                                    <td width="50%">
+                                        <span class="inputword">是</span> <input class="xb-icheck" type="radio" name="ur_filnk_enable"
+                                                                                value="1" checked="checked"> &emsp;&emsp; <span
+                                            class="inputword">否</span> <input class="xb-icheck" type="radio" name="ur_filnk_enable"
+                                                                              value="0" checked>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th width="15%">调用外链条数：</th>
+                                    <td><input class="input-medium" type="number" name="ur_flink_number" style="width: 20%;" maxlength="2" min="0" max="20" value="0" placeholder="数量"> &emsp; <span>数量不可大于20</span></td>
+                                </tr>
+                                <tr>
+                                    <th width="15%">规则内容：</th>
+                                    <td>
+                                        <textarea name="ur_content" id="spider_source" class="form-control resizable processed" rows="10" style="width: 100%;" title="编辑链接规则" placeholder="字符标签：{数字}、{字母}、{大写字母}、{大小写字母}、{大写字母数字}、{大小写字母数字}、{数字字母}、{随机字符}
+时间标签：{日期}、{年}、{月}、{日}、{时}、{分}、{秒}
+动态标签：数字和字母标签后面加数字是位数，如： {数字8}表示8个数字、{数字1-8}示随机1-8个数字
+"></textarea>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <td>{__TOKEN__}<input class="btn btn-success" type="submit" value="添加"></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 查看链接 -->
+        <div class="modal fade" id="View-Links" tabindex="-1" role="dialog" aria-labelledby="View-Links" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times;</button>
+                        <h4 class="modal-title" id="ViewSites"> 查看链接规则</h4></div>
+                    <div class="modal-body">
+                        <table class="table table-striped table-bordered table-hover table-condensed">
+                            <tr>
+                                <th width="15%">规则名称：</th>
+                                <td><input class="input-medium" type="text" id="view_name" style="width: 100%;" placeholder="填写网址名字" disabled></td>
+                            </tr>
+                            <tr>
+                                <th width="15%">规则别名：</th>
+                                <td><input class="input-medium" type="text" id="view_alias" style="width: 100%;" placeholder="填写网址名字" disabled></td>
+                            </tr>
+                            <tr>
+                                <th width="15%">规则类型：</th>
+                                <td><select id="view_ur_type" name="view_ur_type">
+                                    <option value="0" title="普通类型">普通类型</option>
+                                    <option value="1" title="TL 对应">TL 对应</option>
+                                </select></td>
+                            </tr>
+                            <tr style="display: none" name="view-show-from">
+                                <th width="15%">TL 来源表：</th>
+                                <td><select name="view_ur_from_table">
+                                </select></td>
+                            </tr>
+
+                            <tr>
+                                <th width="15%">HerfLang(hl)：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="view_ur_hreflang" style="width: 100%;" placeholder="hreflang">
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th width="17%">默认规则：</th>
+                                <td width="50%">
+                                    <span class="inputword">是</span> <input class="xb-icheck" type="radio" name="view_ur_default"
+                                                                            value="1"> &emsp;&emsp; <span
+                                        class="inputword">否</span> <input class="xb-icheck" type="radio" name="view_ur_default"
+                                                                          value="0">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th width="17%">是否调用外链：</th>
+                                <td width="50%">
+                                    <span class="inputword">是</span> <input class="xb-icheck" type="radio" name="view_ur_filnk_enable"
+                                                                            value="1"> &emsp;&emsp; <span
+                                        class="inputword">否</span> <input class="xb-icheck" type="radio" name="view_ur_filnk_enable"
+                                                                          value="0">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th width="15%">调用外链条数：</th>
+                                <td><input class="input-medium" type="number" name="view_ur_flink_number" id="view_ur_flink_number" style="width: 20%;" maxlength="2" min="0" max="20" value="0" placeholder="数量"> &emsp; <span>数量不可大于20</span></td>
+                            </tr>
+                            <tr>
+                                <th width="15%">链接规则：</th>
+                                <td>
+                                     <textarea name="view_rules" id="view_rules" class="form-control resizable processed" rows="10" style="width: 100%;" title="编辑链接规则" placeholder="字符标签：{数字}、{字母}、{大写字母}、{大小写字母}、{大写字母数字}、{大小写字母数字}、{数字字母}、{随机字符}
+时间标签：{日期}、{年}、{月}、{日}、{时}、{分}、{秒}
+动态标签：数字和字母标签后面加数字是位数，如： {数字8}表示8个数字、{数字1-8}示随机1-8个数字"></textarea>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <input id="view_sid" type="hidden" value=""/>
+                                <td><input class="btn btn-success" id="edit_slink" type="button" value="编辑"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</block>
+<block name="js">
+    <script>
+        // 查看链接
+        $("a[name='ViewRule']").click(function(){
+            sid_hide = $(this).attr('data-rule-id')
+            $.post("{:U('platform/project/url_rules?action=view')}", {ur_id: sid_hide}, function(data, textStatus, xhr) {
+                // 请求成功
+                var flink_enbale;
+                if (data.code === 200) {
+                    $("#view_links").val(data.data.sdomain);
+                    if (data.data.rule == "") {
+                        $("#view_rules").html("当前链接规则已失效！");
+                    } else {
+                        $("#view_rules").html(data.data.rule);
+                        $("#view_alias").val(data.data.alias);
+                        $("#view_name").val(data.data.name);
+                        var typeValue = data.data.type;
+                        var from = data.data.from;
+                        var selectElement = $("#view_ur_type");
+
+                        selectElement.find('option').each(function() {
+                            // 检查当前option的值是否与返回的值相匹配
+                            if ($(this).val() == typeValue) {
+                                // 如果匹配，则将该option设置为selected，否则移除selected属性
+                                $(this).prop('selected', true);
+                            } else {
+                                $(this).prop('selected', false);
+                            }
+                        });
+
+                        if (typeValue == 1) {
+                            view_loading_tl_data(from);
+                        }
+
+                        $("#view_ur_flink_number").val(data.data.ur_flink_number);
+
+                        $("input[name=view_ur_filnk_enable][value='0']").attr("checked", data.data.ur_filnk_enable == '0' ? true : false);
+
+                        $("input[name=view_ur_filnk_enable][value='1']").attr("checked", data.data.ur_filnk_enable == '1' ? true : false);
+
+
+                        $("input[name=view_ur_default][value='0']").attr("checked", data.data.ur_default == '0' ? true : false);
+
+                        $("input[name=view_ur_default][value='1']").attr("checked", data.data.ur_default == '1' ? true : false);
+                    }
+
+                    $("#view_sid").val(data.data.ur_id);
+                    $("input[name='view_ur_hreflang']").val(data.data.ur_hreflang);
+                } else if (data.code === 404) {
+                    alert('没有找到链接!!');
+                    return false;
+                }
+
+                // 选项
+                $("#View-Links").modal('show');
+
+            });
+        });
+
+        // 删除链接
+        $("a[name='DeleteSite']").click(function(){
+            sid_hide = $(this).attr('data-link-sid');
+            if(confirm("是否删除ID为" + sid_hide + "的链接规则？")){
+                // console.log('删除');
+
+                $.post("{:U('Platform/project/url_rules?action=delete')}", {sid: sid_hide}, function(data, textStatus, xhr) {
+                    if(data.code === 200){
+                        alert(data.msg);
+                        document.location.reload();
+                    }
+
+                    if(data.code === 404){
+                        alert(data.msg);
+                        document.location.reload();
+                    }
+                });
+            }
+
+        });
+
+        // 保存链接
+        $("#edit_slink").click(function(){
+            if(confirm("是否编辑当前链接属性，链接变动可能会导致失链情况，继续吗？")){
+                // 获取链接规则
+                rules = $("#view_rules").val();
+                sid = $("#view_sid").val();
+                ur_filnk_enable = $('input[type=radio][name=view_ur_filnk_enable]:checked').val()
+                ur_flink_number = $("input[name='view_ur_flink_number']").val()
+                ur_default = $('input[type=radio][name=view_ur_default]:checked').val();
+                ur_type =  $('select[name="view_ur_type"]').val();
+                ur_from_table = $('select[name="view_ur_from_table"]').val();
+                ur_hreflang = $('input[name="view_ur_hreflang"]').val();
+
+                // 组装数据
+                Upload = {
+                    'ur_id' : sid,
+                    'ur_content' : rules,
+                    'ur_filnk_enable' : ur_filnk_enable,
+                    'ur_flink_number' : ur_flink_number,
+                    'ur_default':ur_default,
+                    'ur_type':ur_type,
+                    'ur_from_table':ur_from_table,
+                    'ur_hreflang':ur_hreflang
+                };
+                $.post("{:U('platform/project/url_rules?action=edit')}",Upload,function(data){
+                    if(data.code === 200){
+                        alert(data.msg);
+                        document.location.reload();
+                    }
+
+                    if(data.code === 302){
+                        alert(data.msg);
+                        return false;
+                    }
+
+                    if(data.code === 404){
+                        alert(data.data);
+                        return false;
+                    }
+                });
+                //alert(view_rules + viwe_sid);
+            }
+        });
+
+        // ajax提交
+        $('#add-form').submit(function(event){
+            event.preventDefault(); // 阻止冒泡时间
+            var tData = {
+                ur_name: $("input[name='ur_name']").val(),
+                ur_content: $("textarea[name='ur_content']").val(),
+                ur_filnk_enable: $('input[type=radio][name=ur_filnk_enable]:checked').val(),
+                ur_flink_number: $("input[name='ur_flink_number']").val(),
+                ur_default : $('input[type=radio][name=ur_default]:checked').val(),
+                ur_type :  $('select[name="ur_type"]').val(),
+                ur_from_table : $('select[name="ur_from_table"]').val(),
+                ur_hreflang : $('input[name="ur_hreflang"]').val()
+            };
+
+            for(var i in tData) {
+                if (tData[i] == "") {
+                    layer.msg('请填写完所有项在提交',{icon: 0});
+                    return false;
+                }
+            }
+
+            $.post("{:U('platform/project/url_rules?action=add')}", tData, function(data, textStatus, xhr) {
+                if(data.code === 200){
+                    alert(data.msg);
+                    document.location.reload();
+                }else{
+                    layer.alert(data.msg,{icon: 2});
+                    return false;
+                    //document.location.reload();
+                }
+            });
+        });
+        // 添加菜单
+        function add() {
+            $("input[name='title']").val('');
+            $('#bjy-add').modal('show');
+        }
+
+        function loading_tl_data(){
+            $.get('{:U("Platform/ProjectApi/keyword?type=tl")}', function(data){
+                // 找到 select 元素
+                var selectElement = $('select[name="ur_from_table"]');
+
+                // 清空 select 元素的现有选项
+                selectElement.empty();
+
+                // 遍历 JSON 数据中的每个对象
+                data.data.forEach(function(item) {
+                    // 创建一个 option 元素
+                    var optionElement = $('<option>');
+
+                    // 设置 option 元素的 value 和文本内容
+                    optionElement.val(item.value).text(item.value);
+
+                    // 将 option 元素添加到 select 元素中
+                    selectElement.append(optionElement);
+                });
+            });
+        }
+
+        function view_loading_tl_data(from) {
+            var url = '{:U("Platform/ProjectApi/keyword?type=tl")}';
+
+            $.get(url, function(data) {
+                // 找到 select 元素
+                var selectElement = $('select[name="view_ur_from_table"]');
+
+                // 清空 select 元素的现有选项
+                selectElement.empty();
+
+                // 遍历 JSON 数据中的每个对象
+                data.data.forEach(function(item) {
+                    // 创建一个 option 元素
+                    var optionElement = $('<option>');
+
+                    // 设置 option 元素的 value 和文本内容
+                    optionElement.val(item.value).text(item.value);
+
+                    // 如果当前选项的值等于传入的 form 参数，则将该选项设置为选中状态
+                    console.log(from)
+                    if (item.value === from) {
+                        optionElement.prop('selected', true);
+                    }
+
+                    // 将 option 元素添加到 select 元素中
+                    selectElement.append(optionElement);
+                });
+            });
+            $("tr[name='view-show-from']").show();
+        }
+
+
+        $('select[name="view_ur_type"]').change(function(){
+            // 获取所选值
+            var selectedValue = $(this).val();
+
+            // 如果所选值为1（即"TL 对应"）
+            if(selectedValue === "1") {
+                // 显示第二个下拉列表框所在的<tr>
+                $('tr[name="view-show-from"]').show();
+                view_loading_tl_data();
+            } else {
+                // 否则隐藏第二个下拉列表框所在的<tr>
+                $('tr[name="view-show-from"]').hide();
+            }
+        });
+
+
+        $('select[name="ur_type"]').change(function(){
+            // 获取所选值
+            var selectedValue = $(this).val();
+
+            // 如果所选值为1（即"TL 对应"）
+            if(selectedValue === "1") {
+                // 显示第二个下拉列表框所在的<tr>
+                $('tr[name="show-from"]').show();
+                loading_tl_data();
+            } else {
+                // 否则隐藏第二个下拉列表框所在的<tr>
+                $('tr[name="show-from"]').hide();
+            }
+        });
+
+        // 修改菜单
+    </script>
+</block>

@@ -1,0 +1,423 @@
+<extend name="Public:base"/>
+<block name="title">Global设置 - 项目管理</block>
+<block name="content">
+    <div class="page-header"><h1> 项目管理 &gt; Global设置</h1></div>
+    <style>
+        .title{
+            width: 150px;
+        }
+        .layui-input-block > input[type='text']{
+            width: 30%;
+        }
+        .layui-input-block > textarea{
+            width: 30%;
+        }
+        .layui-input-block > blockquote{
+            width: 55%;
+            margin-left: 40px;
+        }
+        #kw_group, #title_style, #keyword_style, #description_style{
+            width: 30%;
+            margin-left: 40px;
+        }
+        .lite-info{
+            display: block;
+            padding-top: 11px;
+            color: #00c795;
+            font-size: 16px;
+        }
+        #lite-cache-up{
+            padding-left: 5%;
+        }
+
+    </style>
+    <div class="col-xs-12">
+        <blockquote class="layui-elem-quote">Global Lite 版本为ASPX Global 的无项目设置，这里设置将直接影响未添加到项目管理的站。注：仅支持Global类型项目。</blockquote>
+        <fieldset>
+            <legend>基本信息</legend>
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="width:10%;">托管数量</label>
+                <div class="layui-input-inline">
+                    <span class="lite-info layui-anim-scaleSpring"><a href="javascript:;" id="show-lite-total">加载中...</a></span>
+                </div>
+                <label class="layui-form-label" style="width:10%;">缓存数量</label>
+                <div class="layui-input-inline">
+                    <span class="lite-info" id="lite-cache">加载中...</span>
+                </div>
+                <label class="layui-form-label" style="width:10%;">上次编辑</label>
+                <div class="layui-input-inline">
+                    <span class="lite-info "><?php echo(date('Y-m-d H:i:s',$data['update_time']));?></span>
+                </div>
+            </div>
+        </fieldset>
+        <form class="layui-form" action="{:U('platform/project/global_manager')}" method="post">
+            <fieldset>
+                <legend>随缘设置</legend>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width:150px;">关键词库</label>
+                    <div class="layui-input-block">
+                        <div id="kw_group"></div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label title"  style="">模板 (*)</label>
+                    <div class="layui-input-inline">
+                        <select name="template" id="template" lay-filter="required" lay-reqtext="你还没有选择项目模板~">
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label title"  style="">内链设置 (*)</label>
+                    <div class="layui-input-block">
+                        <textarea name="ilink_rules" lay-filter="required" id="v_url_rules" lay-reqtext="内链规则不能为空~" placeholder="一行代表一个规则 标签参照下方提示" class="layui-textarea" style="height: 200px;"><?php echo(unserialize(base64_decode($data['ilink_rules'])));?></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label title"  style="">标签提示</label>
+                    <div class="layui-input-block">
+                        <blockquote class="layui-elem-quote layui-quote-nm">
+                            字符标签：{数字}、{字母}、{大写字母}、{大小写字母}、{大写字母数字}、{大小写字母数字}、{数字字母}、{随机字符}<br/>
+                            时间标签：{日期}、{年}、{月}、{日}、{时}、{分}、{秒}<br/>
+                            动态标签：数字和字母标签后面加数字是位数，如： {数字8}表示8个数字、{数字1-8}示随机1-8个数字
+                        </blockquote>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label title"  style="">广告JS</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="ad_js"  placeholder="广告JS" lay-reqtext="广告JS不能为空~"value="<?php echo($data['advert_option']['ad_js']);?>" autocomplete="off" class="layui-input" >
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width:150px;">标题</label>
+                    <div class="layui-input-block">
+                        <div id="title_style"></div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width:150px;">关键词</label>
+                    <div class="layui-input-block">
+                        <div id="keyword_style"></div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width:150px;">描述</label>
+                    <div class="layui-input-block">
+                        <div id="description_style"></div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label title">页面压缩</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox"  name="page_compress" lay-skin="switch" lay-text="ON|OFF"<?php if($data['seo_option']['page_compress'] == 'on'):?> checked<?php endif;?> />
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">压缩过的页面比原体积小 搜索引擎更喜欢</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label title">禁止快照</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="disable_snapshots" lay-skin="switch" lay-text="ON|OFF" <?php if($data['seo_option']['disable_snapshots'] == 'on'):?> checked<?php endif;?>/>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">快照禁止后在搜索引擎无法演示快照内容，但不影响排名</div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label title" pane>缓存开关</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="cache_on" lay-skin="switch" lay-filter="cache_on" lay-text="开启|关闭" <?php if($data['cache_option']['cache_on'] == 'on'):?> checked<?php endif;?>>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">缓存关闭后页面将动态更新</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label title" pane>缓存方法</label>
+                    <div class="layui-input-inline">
+                        <select name="cache_type" id="cache_class" lay-filter="cache_class">
+                            <option value="">请选择</option>
+                            <optgroup label="局部缓存">
+                                <option value="0">缓存TKD</option>
+                                <option value="1">缓存TKDB</option>
+                            </optgroup>
+                            <optgroup label="全局缓存">
+                                <option value="2">全部缓存</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux" id="cache_tips">请选择缓存方法</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label title">缓存周期</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="cache_expires" id="v_cache_expires" value="<?php echo($data['cache_option']['cache_expires']);?>" required  lay-verify="required|number" placeholder="请输入缓存周期，0为无限期" autocomplete="off" value="0" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux" id="v_cache_expires_tips">单位：天 如果大于缓存有效期则会强制删除缓存 0 为直接缓存</div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label title">模板混淆</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" id="encode_style" name="encode_style[]" title="class混淆" value="class">
+                        <input type="checkbox" id="encode_style" name="encode_style[]" title="id混淆" value="id">
+                        <input type="checkbox" id="encode_style" name="encode_style[]" title="标签混淆" value="tag">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux" id="encode_style_tips">模板混淆后，起到一定的防K作用</div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="formDemo">更改</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</block>
+
+<block name="js">
+    <script src="__PUBLIC__/statics/xm-select/xm-select.js"></script>
+    <script>
+
+        var reslut = null;
+
+
+
+        $.get("{:U('platform/project/global_manager?kwa=1')}",function(res){
+            reslut = res;
+            var encodeType = [];
+            if(res.encode_style !== null) {
+                encodeType = res.encode_style.split(",");
+                for (var j = 0; j < encodeType.length; j++) {
+                    var unitTypeCheckbox = $("input[id='encode_style']");
+                    for (var i = 0; i < unitTypeCheckbox.length; i++) {
+                        if (unitTypeCheckbox[i].value == encodeType[j]) {
+                            unitTypeCheckbox[i].checked = true;
+                        }
+                    }
+                }
+            }
+            layui.form.render();
+
+            var keyword_style = xmSelect.render({
+                el: '#keyword_style',
+                toolbar:{
+                    show: true,
+                },
+                autoRow: true,
+                size:'small',
+                name : 'keyword_style',
+                layVerify: 'required',
+                layVerType: 'msg',
+                initValue: res.keyword_style,
+                tips: '可选择多个关键词样式 程序随机调用',
+
+                data: [
+                    {name: '主关键词', value: 1},
+                    {name: '主关键词,关联关键词', value: 2},
+                    {name: '主关键词,关联关键词1,关联关键词2', value: 3},
+                    {name: '随机关键词', value: 4},
+                ]
+            })
+
+            var description_style = xmSelect.render({
+                el: '#description_style',
+                toolbar:{
+                    show: true,
+                },
+                autoRow: true,
+                size:'small',
+                name:'description_style',
+                layVerify: 'required',
+                layVerType: 'msg',
+                tips: '可选择多个描述样式 程序随机调用',
+                initValue: res.description_style,
+                data: [
+                    {name: '主关键词+文章正文', value: 1},
+                    {name: '主关键词随机插入正文', value: 2},
+                    {name: '主关键词', value: 3},
+                    {name: '随机关键词堆砌', value: 4},
+                    {name: '来自描述文件', value: 5},
+                ]
+            })
+
+            var title_style = xmSelect.render({
+                el: '#title_style',
+                toolbar:{
+                    show: true,
+                },
+                layVerify: 'required',
+                layVerType: 'msg',
+                tips: '可选择多个标题样式 程序随机调用',
+                autoRow: true,
+                size:'small',
+                name:'title_style',
+                initValue: res.title_style,
+                data: [
+                    {name: '主关键词', value: 1},
+                    {name: '主关键词 - 副标题', value: 2},
+                    {name: '主关键词 - 关联关键词', value: 3},
+                    {name: '主关键词 -关联关键词1-关联关键词2', value: 4},
+                    {name: '主关键词:文章标题', value: 5},
+                ]
+            })
+
+            layui.form.render();
+
+            demo2.update({
+                initValue: res.keyword
+            })
+
+        });
+
+
+        $.ajax({
+            url:'{:U("Platform/Project/templates_list?ajax=1")}',
+            type:"get",
+            cache: false,
+            error:function(){
+                alert('加载出错，请检查后台配置！');
+                return false;
+            },
+            success:function(data) {
+                if (data.code == 500) {
+                    alert('模板库加载出错，请检查后台配置！');
+                    return false;
+                }
+
+                if (data.code == 200) {
+                    $("select[name='template']").empty();
+                    var modelList = data.data;
+                    var option = "<option value=\"\"><optgroup title='使用随机模板' label='使用随机模板'>" +
+                        "<option title='随机模板' value='random'>随机模板</option>" + "</optgroup>" +
+                        "<optgroup title='使用普通模板库' label='使用普通模板库'>";
+                    if (modelList && modelList.length != 0) {
+                        for (var i = 0; i < modelList.length; i++) {
+                            option +="<option title=\"" + modelList[i] + "\" value=\""+modelList[i]+"\">" + modelList[i] +  "</option>";
+                        }
+                        option += "</optgroup>";
+                        $("#template").append(option);
+                        if(reslut.project_template !== null) {
+                            $("#template").find("option[value='" + reslut.project_template + "']").prop("selected", true);
+                        }
+                        //console.log(reslut.project_template);
+                        layui.form.render();
+                    }
+                }
+            }
+        });
+
+        var demo2 = xmSelect.render({
+            el: '#kw_group',
+            toolbar: {show: true},
+            size:'small',
+            data: [],
+            name:'keyword'
+        })
+
+        $.get("{:U('Platform/Project/keyword?action=list')}",function(res){
+            demo2.update({
+                data: res.data,
+                autoRow: true,
+            })
+        });
+
+        $("select[name='cache_type']").find("option[value='<?php echo($data['cache_option']['cache_type']); ?>']").prop("selected",true);
+
+
+        layui.form.on('select(cache_class)', function(data){
+            // console.log(data);
+            // var cache_on = $("#cache_on").prop("checked")
+            switch (data.value) {
+                case "0":
+                    $("#cache_tips").text('仅缓存标题、关键词、描述。')
+                    break;
+                case "1":
+                    $("#cache_tips").text('仅缓存标题、关键词、描述、内容')
+                    break;
+                case "2":
+                    $("#cache_tips").text('缓存页面的所有内容')
+                    break;
+                default:
+                    $("#cache_tips").text('请选择缓存方法')
+                    break;
+            }
+        });
+
+        $.get("{:U('Platform/Project/global_manager?info=total')}",function (data) {
+            $("#lite-cache").text(formatNumber(data))
+        })
+
+        $.get("{:U('Platform/Project/global_manager?info=get_total')}",function (data) {
+            $("#show-lite-total").text(formatNumber(data.total))
+        })
+
+        $("#show-lite-total").on('click',function(){
+            $.get("{:U('Platform/Project/global_manager?info=cat')}",function(data){
+                if(data.code !== 200){
+                    layer.msg(data.message)
+                }
+                layer.open({
+                    type: 1 //Page层类型
+                    ,area: ['650px', '650px']
+                    ,title: '查看托管列表'
+                    ,shade: 0.6 //遮罩透明度
+                    ,maxmin: false //允许全屏最小化
+                    ,anim: 2 //0-6的动画形式，-1不开启
+                    ,content: '<textarea id="datas" style="height: 600px; width:630px;font-size:16px;" readonly disabled></textarea>'
+                });
+                var contents = "";
+                for (list=0;list<data.data.length;list++){
+                    contents += data.data[list];
+                }
+
+                $('#datas').html(contents);
+            })
+        });
+
+        function formatNumber(num) {
+            var decimalPart = '';
+            num = num.toString();
+            if (num.indexOf('.') != -1) {
+                decimalPart = '.' + num.split('.')[1];
+                num = parseInt(num.split('.')[0]);
+            }
+            var array = num.toString().split('');
+            var index = -3;
+            while (array.length + index > 0) {
+                array.splice(index, 0, ',');
+                index -= 4;
+            }
+            return array.join('') + decimalPart;
+        };
+        // 提交修改
+        layui.form.on('submit(formDemo)',function (result) {
+            var _data = result.field;
+            layer.load(5, { shade: [0.5, "#5588AA"] });
+            $.ajax({
+                url:'{:U(\'platform/project/global_manager\')}',
+                type:'post',
+                data:_data,
+                success:function(result){
+                    if(result.code == 200) {
+                        layer.closeAll("loading");
+                        layer.msg(result.msg, {icon: 16, time: 3000},function(){
+                            window.location.reload();
+                        })
+                    }
+
+                    if(result.code == 404) {
+                        layer.closeAll("loading");
+                        layer.msg(result.msg);
+                    }
+                },error: function (xhr, ajaxOptions, thrownError) {
+                    console.log(xhr);
+                    layer.closeAll("loading");
+                }
+            });
+            return false;
+        })
+    </script>
+</block>

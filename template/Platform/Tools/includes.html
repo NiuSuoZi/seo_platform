@@ -1,0 +1,172 @@
+<extend name="Public:base" />
+
+<block name="title">文件索引加密</block>
+<block name="content">
+    <!-- 导航栏开始 -->
+    <div class="page-header">
+        <h1>
+             <i class="fa fa-cog icon-test"></i>&nbsp;辅助工具
+            &gt;文件索引加密
+        </h1>
+    </div>
+    <style type="text/css">
+        .btn-top{
+            margin-top: 10px;
+        }
+        .btn-left{
+            float: right;
+        }
+    </style>
+    <div class="col-xs-12">
+        <div class="tabbable">
+            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+                <li class="active">
+                    <a href="#home" data-toggle="tab">PHP 索引代码加密</a>
+                </li>
+                <li>
+                    <a href="javascript:;">ASP 索引代码加密</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <textarea class="form-control" rows="5" placeholder="请输入需要包含的文件路径..如:../upload/logo.jpg"></textarea>
+
+            <div class="form-group form-inline">
+            <button name="encrypt_php" class="btn btn-primary btn-xs btn-top">加密(<u>E</u>ncrypt)</button>
+            <button name="encrypt_php" class="btn btn-primary btn-xs btn-top btn-left">还原(<u>D</u>ncrypt)</button>
+        </div>
+        </div>
+
+    </div>
+
+    <!-- 添加菜单模态框开始 -->
+    <div class="modal fade" id="bjy-add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+             <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        添加菜单
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="bjy-form" class="form-inline" action="{:U('Platform/Nav/add')}" method="post">
+                        <input type="hidden" name="pid" value="0">
+                        <table class="table table-striped table-bordered table-hover table-condensed">
+                            <tr>
+                                <th width="12%">菜单名：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="name">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>连接：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="mca"> 输入模块/控制器/方法即可 例如 Platform/Nav/index
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>图标：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="ico">
+                                    font-awesome图标 输入fa fa- 后边的即可
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <input class="btn btn-success" type="submit" value="添加">
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 添加菜单模态框结束 -->
+
+    <!-- 修改菜单模态框开始 -->
+    <div class="modal fade" id="bjy-edit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+             <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        修改菜单
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="bjy-form" class="form-inline" action="{:U('Platform/Nav/edit')}" method="post">
+                        <input type="hidden" name="id">
+                        <table class="table table-striped table-bordered table-hover table-condensed">
+                            <tr>
+                                <th width="12%">菜单名：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="name">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>连接：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="mca"> 输入模块/控制器/方法即可 例如 Platform/Nav/index
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>图标：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="ico">
+                                    font-awesome图标 输入fa fa- 后边的即可
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td>
+                                    <input class="btn btn-success" type="submit" value="修改">
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 修改菜单模态框结束 -->
+</block>
+<block name="js">
+    <script>
+    // 添加菜单
+    function add(){
+        $("input[name='name'],input[name='mca']").val('');
+        $("input[name='pid']").val(0);
+        $('#bjy-add').modal('show');
+    }
+
+    // 添加子菜单
+    function add_child(obj){
+        var navId=$(obj).attr('navId');
+        $("input[name='pid']").val(navId);
+        $("input[name='name']").val('');
+        $("input[name='mca']").val('');
+        $("input[name='ico']").val('');
+        $('#bjy-add').modal('show');
+    }
+
+    // 修改菜单
+    function edit(obj){
+        var navId=$(obj).attr('navId');
+        var navName=$(obj).attr('navName');
+        var navMca=$(obj).attr('navMca');
+        var navIco=$(obj).attr('navIco');
+        $("input[name='id']").val(navId);
+        $("input[name='name']").val(navName);
+        $("input[name='mca']").val(navMca);
+        $("input[name='ico']").val(navIco);
+        $('#bjy-edit').modal('show');
+    }
+    </script>
+</block>

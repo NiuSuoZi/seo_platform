@@ -1,0 +1,105 @@
+<extend name="Public:base"/>
+<block name="title">模板库管理</block>
+<block name="content">
+    <div class="page-header">
+        <h1> 服务端管理&gt; 模板库管理</h1>
+    </div>
+    <div class="col-xs-12">
+       <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+            <li class="active"> <a href="#home" data-toggle="tab">模板列表</a></li>
+            <li><a href="#home" data-toggle="tab">添加模板</a></li>
+        </ul>
+        <div class="tabbable">
+            <div class="tab-content">
+                <table class="table table-bordered table-hover">
+                    <tbody>
+                    <tr>
+                        <th>模板ID</th>
+                        <th>模板名称</th>
+                        <th>内链数</th>
+                        <th>关键词数</th>
+                        <th>随机新闻数</th>
+                        <th>模板备注</th>
+                        <th>模板类型</th>
+                        <th>模板状态</th>
+                        <th>模板操作</th>
+                    </tr>
+                     <?php if(is_array($TemplateList)) : foreach($TemplateList as $key=>$value) : ?>
+                    <tr>
+                        <td><?php echo($TemplateList[$key]['tid']);?></td>
+                        <td><?php echo($TemplateList[$key]['t_name']);?></td>
+                        <td><?php echo($TemplateList[$key]['t_link_count']);?></td>
+                        <td><?php echo($TemplateList[$key]['t_keywords_count']);?></td>
+                        <td>1</td>
+                        <td><?php echo($TemplateList[$key]['t_remarks']);?></td>
+                        <td><?php echo($TemplateList[$key]['t_type']);?></td>
+                        <td><?php if($TemplateList[$key]['t_state'] == 1) :?><?php echo("已启用");?> <?php else:?> <?php echo("已禁用");?><?php endif;?></td>
+                        <td><a class="label label-success" href="javascript:;" data-role="<?php echo($TemplateList[$key]['tid']);?>" name="tpl_show">查看</a> <a class="label label-warning" href="javascript:;" name="tpl_edit">编辑</a> </td>
+                    </tr>
+                    <?php endforeach;?>
+                    <?php endif;?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="template_add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times;</button>
+                    <h4 class="modal-title" id="myModalLabel">添加模板</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="bjy-form" class="form-inline" action="{:U('Platform/Rule/add')}" method="post" enctype="">
+                        <div class="form-group">
+                            11
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="template_show" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times;</button>
+                    <h4 class="modal-title" id="myModalLabel">查看模板</h4>
+                </div>
+                <div class="modal-body">
+                <div class="row">
+                    <p>模板名称：<span class="label label-primary" id="tpl_name"></span></p>
+                    <p>模板类型：<span class="label label-warningl" id="tpl_types"></span></p>
+                    <p>模板备注：<span class="label label-success" id="tpl_remark"></span></p>
+                    <textarea class="form-control resizable processed" rows="30" style="height: 580px;" title="源代码模式" id="tpl_source" readonly>
+                    </textarea>
+                </div>
+                    
+            </div>
+        </div>
+    </div>
+</div>
+</block>
+<block name="js">
+    <script>
+       $(function(){
+            // 模板查看
+            $("a[name='tpl_show']").click(function(event) {
+                var objects = $("a[name='tpl_show']");
+                var tid = objects.attr('data-role');
+                var object = null;
+                
+                $.post("{:U('platform/server/templates?action=show')}", {tid: tid}, function(data, textStatus, xhr) {
+                    $("#tpl_name").html(data["0"].t_name);
+                    $("#tpl_types").html(data["0"].t_type);
+                    $("#tpl_remark").html(data["0"].t_remarks)
+                    $("#tpl_source").html(data["0"].t_source);
+                });
+                    $("#template_show").modal('show');
+            });
+       });
+    </script>
+</block>

@@ -1,0 +1,211 @@
+<extend name="Public:base"/>
+<block name="title">站群管理 - TDK调用模板</block>
+<block name="content">
+    <div class="page-header"><h1> 站群管理 &gt; TDK调用模板</h1></div>
+    <style>
+        .table {
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        .table-bordered {
+            border: 1px solid #ddd;
+        }
+
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+            padding: 8px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f9f9f9; /* 鼠标悬停时的背景颜色 */
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: #fff;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: #fff;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background-color: #bd2130;
+            border-color: #a71d2a;
+        }
+
+        .operate-menu {
+            min-width: 120px; /* 控制菜单宽度 */
+            padding: 5px 0;
+            border-radius: 4px; /* 圆角样式 */
+            box-shadow: none; /* 去除下拉阴影 */
+            border: 1px solid #ddd; /* 边框颜色 */
+        }
+
+        .operate-menu li a {
+            font-size: 12px; /* 调整字体大小 */
+            padding: 5px 10px; /* 调整内边距，适配小尺寸按钮 */
+            display: flex; /* 支持图标和文字对齐 */
+            align-items: center;
+        }
+
+        .operate-menu li a i {
+            margin-right: 6px; /* 图标与文字的间距 */
+            font-size: 12px; /* 缩小图标大小 */
+        }
+
+        .operate-menu .divider {
+            margin: 4px 0; /* 分割线间距 */
+            height: 1px;
+            background-color: #ddd;
+        }
+
+        .text-danger {
+            color: #dc3545; /* 删除项红色 */
+        }
+
+    </style>
+    <div class="col-xs-12">
+        <!-- 工具栏 -->
+        <div class="clearfix mb-2">
+            <div class="pull-right">
+                <button class="btn btn-primary btn-minier" id="addTemplate">
+                    <i class="ace-icon fa fa-plus"></i> 添加
+                </button>
+            </div>
+        </div>
+
+        <!-- 表格 -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>TDK模板名称</th>
+                    <th>泛域名前缀</th>
+                    <th>站群关键词</th>
+                    <th>站群模板</th>
+                    <th>站群内容源</th>
+                    <th>广告地址</th>
+                    <th>站群使用数</th>
+                    <th>上次编辑</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php if (!empty($data)) : ?>
+                <?php foreach($data as $itme):?>
+                <tr>
+                    <td><?php echo($itme['display_name']);?></td>
+                    <td><?php if($itme['category'] == 1):?>词库生成<?php else:?>随机字符<?php endif;?></td>
+                    <td><?php echo($itme['category_keyword']);?></td>
+                    <td><?php echo($itme['category_template']);?></td>
+                    <td><?php echo($itme['category_content']);?></td>
+                    <td><a href="javascript:;"><?php echo($itme['ad_url']);?></a></td>
+                    <td><?php echo($itme['usage_count']);?></td>
+                    <td><?php echo(word_time($itme['last_edit_time']));?></td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-minier btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                更多
+                                <i class="ace-icon fa fa-caret-down"></i>
+                            </button>
+                            <ul class="operate-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                                <li>
+                                    <a href="javascript:;" id="edit-item" data-item-tid="<?php echo($itme['id']);?>">
+                                        <i class="ace-icon fa fa-pencil-alt"></i> 编辑
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;" id="delete-item" class="text-danger" data-item-tid="<?php echo($itme['id']);?>">
+                                        <i class="ace-icon fa fa-trash-alt"></i> 删除
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <?php endforeach;?>
+                <?php else : ?>
+                <tr>
+                    <td colspan="9" class="text-center" style="color: #FF5722; font-weight: bold;">暂时还没有数据~</td>
+                </tr>
+                <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</block>
+
+<block name="js">
+    <script>
+
+            $("a[id='edit-item']").on('click',function(){
+                let tid = $(this).attr('data-item-tid');
+                layer.open({
+                    type: 2,
+                    title: '修改TDK模板',
+                    area: ['70%', '80%'],
+                    maxWidth:'650px',
+                    content: "{:U('platform/website/tdkemplateedit?tid')}" + tid // 替换为你的 iframe 地址
+                });
+            })
+
+
+            $("#addTemplate").on('click',function () {
+                layer.open({
+                    type: 2,
+                    title: '添加TDK模板',
+                    area: ['70%', '80%'],
+                    maxWidth:'650px',
+                    content: "{:U('platform/website/tdkemplateadd')}" // 替换为你的 iframe 地址
+                });
+            });
+            
+            $("a[id='delete-item']").on('click', function() {
+                let mid = $(this).attr('data-item-tid');
+                layer.confirm('确定要删除此记录吗？', {
+                    icon: 3,
+                    title: '删除确认'
+                }, function(index) {
+                    $.ajax({
+                        url: '{:U("platform/website/tdkdelete")}',
+                        type: 'POST',
+                        data: { mid: mid },
+                        dataType: 'json',
+                        success: function(response) {
+                            if(response.status == 1) {
+                                layer.msg('删除成功！', {icon: 1});
+                                // 可根据需要刷新页面或删除对应的DOM节点
+                                location.reload();
+                            } else {
+                                layer.msg('删除失败：' + response.info, {icon: 2});
+                            }
+                        },
+                        error: function() {
+                            layer.msg('请求失败，请稍后重试！', {icon: 2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            });
+
+    </script>
+</block>

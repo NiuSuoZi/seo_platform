@@ -1,0 +1,893 @@
+<extend name="Public:base"/>
+<block name="title">项目管理 - 站点列表</block>
+<block name="content">
+    <div class="page-header"><h1> 项目管理 &gt; 站点列表</h1></div>
+    <style>
+        .layui-form-label{
+            width: 100px;
+        }
+
+        .layui-input-inline {
+            width: 715px;
+        }
+        .layui-input-block{
+            width: 715px;
+        }
+        .message-tips{
+            margin-top: 5px;
+            display: block;
+            white-space:pre-wrap;
+            word-break: normal;
+        }
+        .message-bodys{
+            padding-left: 10px;
+        }
+    </style>
+    <div class="col-xs-12">
+        <div class="tabbable">
+            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+                <li class="active"><a href="javascript:;" data-toggle="tab">项目列表</a></li>
+                <li><a href="javascript:;" onclick="add()">新建项目</a></li>
+            </ul>
+            <div class="tabbable">
+                <div class="tab-content">
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <!--<th>项目ID</th>-->
+<!--                            <th>项目类型</th>-->
+                            <th>项目URL</th>
+                            <th>SITEID</th>
+                            <th>URL规则数</th>
+                            <th>广告地址</th>
+                            <th>站点模板</th>
+                            <th>项目状态</th>
+                            <th>关联词组</th>
+                            <th>更新时间</th>
+                            <th>项目类型</th>
+                            <th>SEO数据</th>
+                            <th>缓存数量</th>
+                            <!--<th>搜狗权重(PR)</th>-->
+                            <th>操作</th>
+                        </tr>
+                        <?php if(!empty($data)) : ?>
+                        <?php foreach($data as $key=>$value) : ?>
+                        <?php $_class = array('badge-pink','badge-purple','badge-yellow','badge-success','badge-inverse','badge-danger','badge-grey','');?>
+                        <?php $k_class = mt_rand(0,count($_class) - 1);?>
+                        <?php $_rand = array_rand($_class);?>
+                        <?php $kw = explode(",",$data[$key]['keyword']);?>
+                        <?php $kw_count = count($kw);?>
+                        <?php $template = unserialize($data[$key]['seo_option']);?>
+                        <?php $advert = unserialize($data[$key]['advert_option']);?>
+                        <tr>
+                            <!--<td><?php echo($data[$key]['id']);?></td>-->
+<!--                            <td><?php echo($data[$key]['name']);?></td>-->
+                            <td><a href="javascript:;" name="domain"><?php echo($data[$key]['project_url']);?></a></td>
+                            <td><code><?php echo($data[$key]['siteid']);?></code></td>
+                            <td><span class="badge <?php echo($_class[$_rand]) ;?>"><?php echo(count(explode("\n",unserialize(base64_decode($data[$key]['ilink_rules'])))));?></span></td>
+                            <td><?php echo($advert['ad_js']);?></td>
+                            <td>
+                                <?php $tpl = ($template['project_template'] !== null) ? explode(",", $template['project_template']) : null;
+                               $tpl_count = ($tpl !== null) ? count($tpl) : 0; ?>
+                                <details>
+                                    <summary>使用<span class="badge <?php echo($_class[$k_class]) ;?>"><?php echo($tpl_count);?></span>个模板</summary>
+                                    <ul>
+                                        <?php foreach($tpl as $mkey => $mvalues) : ?>
+                                        <li><code><?php echo($mvalues);?></code></li>
+                                        <?php endforeach;?>
+                                    </ul>
+                                </details>
+                            </td>
+                            <!--                            <td><?php echo($data[$key]['web_status']);?></td>-->
+                            <td><?php if($data[$key]['project_status'] == 0): ?><b class="green">启用</b><?php else:?><b class="red">停用</b><?php endif;?></td>
+                            <td><details>
+                                <summary>关联<span class="badge <?php echo($_class[$k_class]) ;?>"><?php echo($kw_count);?></span>个词组</summary>
+                                <ul>
+                                    <?php foreach($kw as $keys => $values) : ?>
+                                    <li><code><?php echo($values);?></code></li>
+                                    <?php endforeach;?>
+                                </ul>
+                            </details></td>
+                            <td><b class="red"><?php echo(word_time($data[$key]['update_time']));?></b></td>
+                            <td><span class="label label-sm <?php echo($view_site_types[$data[$key]['site_type']]);?>"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"><?php echo($type_info[$data[$key]['site_type']]);?></font></font></span></td>
+                            <td><a name="seo-data" href="javascript:;" data-domain="<?php echo(parse_url($data[$key]['project_url'])['host']);?>">显示</a></td>
+                            <td><a name="cache-total" href="javascript:;" data-site-id="<?php echo($data[$key]['siteid']);?>">查看</a></td>
+
+                            <td><a class="btn-xs btn-primary" data-site-sid="<?php echo($data[$key]['id']);?>" name="ViewSite" href="javascript:void(0);">编辑</a>&nbsp;<a class="btn-xs btn-danger" name="DeleteSite" data-site-sid="<?php echo($data[$key]['id']);?>" data-domain="<?php echo(parse_url($data[$key]['project_url'])['host']);?>" href="javascript:void(0);">删除</a></td>
+                        </tr>
+                        <?php endforeach;?>
+                        <?php else:?>
+                        <td colspan="12" class="center"><b class="red">暂时还没有站点~</b></td>
+                        <?php endif;?>
+                    </table>
+                    <nav style="text-align: center">
+                        {$page}
+                    </nav>
+                </div>
+            </div>
+    </div>
+        <div id="create-project" style="display: none;">
+            <div class="layui-tab layui-tab-card" lay-filter="add-project-tab">
+                <ul class="layui-tab-title">
+                    <li class="layui-this"><i class="layui-icon layui-icon-username"></i> 基础信息</li>
+                    <li><i class="layui-icon layui-icon-set"></i> SEO选项</li>
+                    <li><i class="layui-icon layui-icon-website"></i> 内链设置</li>
+                    <li><i class="layui-icon layui-icon-link"></i> 外链设置</li>
+                    <li><i class="layui-icon layui-icon-print"></i> 缓存设置</li>
+                    <li><i class="layui-icon layui-icon-rmb"></i> 广告设置</li>
+                    <li><i class="layui-icon layui-icon-note"></i> 推送设置</li>
+                    <li><i class="layui-icon layui-icon-layer"></i> 其他设置</li>
+                </ul>
+                <div class="layui-tab-content" style="height: 450px;">
+                    <form class="layui-form" action="{:U('platform/project/table?action=add')}" method="post">
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-form-pane">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" pane>项目类型</label>
+                                <div class="layui-input-block">
+                                    <select name="project_type" lay-verify="required" lay-reqText="请选择项目类型！">
+                                        <option value=""></option>
+                                        <option value="0">泛目录</option>
+                                        <option value="1">动态寄生虫</option>
+                                        <option value="2">Global</option>
+                                        <option value="3">URL重写</option>
+                                        <option value="4">404劫持</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">项目标识</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="project_name" required  lay-verify="required" lay-reqText="项目标识必须填写" placeholder="新的项目" autocomplete="on" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item" id="singe-project">
+                                <label class="layui-form-label">项目地址</label>
+                                <div class="layui-input-inline" style="width: 695px;">
+                                    <input type="text" name="singe_project_url"  placeholder="http://www.example.com/" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-word-aux">  <a href="javascript:;" title="批量添加项目" id="batch" style="text-decoration:none;"><i class="layui-icon layui-icon-add-circle-fine"></i></a></div>
+                            </div>
+                            <input type="hidden" name="mult_option" id="mult-option" value="0">
+                            <div class="layui-form-item" id="mult-project" style="display: none;">
+                                <label class="layui-form-label">项目地址</label>
+                                <div class="layui-input-block">
+                                    <textarea name="mult_project_url" id="mult_project_url" placeholder="一行代表一个地址" class="layui-textarea" style="height: 250px;"></textarea>
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">项目备注</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="rankname" required  lay-verify="required" lay-reqText="项目备注必须填写" placeholder="请输入項目备注"  autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">项目监控</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="monitor_status" lay-skin="switch" lay-text="开启|关闭">
+                                </div>
+                                <div class="layui-form-mid layui-word-aux">开启项目监控后，在“其他设置”选项中配置监控内容</div>
+
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">网站编码</label>
+                                <div class="layui-input-block">
+                                        <select name="project_charset" lay-verify="required" lay-reqText="请选择网站编码~">
+                                            <option value=""></option>
+                                            <option value="0">UTF-8</option>
+                                            <option value="1">GBK</option>
+                                        </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>  <!-- 优化设置 -->
+                    <div class="layui-tab-item">
+                        <div class="layui-form">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">词 库</label>
+                                    <div class="layui-input-block">
+                                        <div id="kw_group"></div>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">模 板</label>
+                                    <div class="layui-input-block">
+                                        <div id="project_template"></div>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" pane>标题</label>
+                                    <div class="layui-input-block">
+<!--                                        <select name="title_style" lay-verify="required" multiple lay-reqText="标题样式还没有选择呐">-->
+<!--                                            <option value=""></option>-->
+<!--                                            <option value="0">{主关键词}</option>-->
+<!--                                            <option value="1">{主关键词} - {副标题}</option>-->
+<!--                                            <option value="2">{主关键词} - {关联关键词}</option>-->
+<!--                                            <option value="3">{主关键词} -{关联关键词1}-{关联关键词2}</option>-->
+<!--                                            <option value="4">{主关键词}:{文章标题}</option>-->
+<!--                                        </select>-->
+                                        <div id="title_style"></div>
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" pane>关键词</label>
+                                    <div class="layui-input-block">
+<!--                                        <select name="keyword_style" lay-verify="required" lay-reqText="关键词对于SEO非常重要嚄~">-->
+<!--                                            <option value=""></option>-->
+<!--                                            <option value="0">{主关键词}</option>-->
+<!--                                            <option value="2">{主关键词},{关联关键词}</option>-->
+<!--                                            <option value="3">{主关键词},{关联关键词1},{关联关键词2}</option>-->
+<!--                                            <option value="4">{随机关键词}</option>-->
+<!--                                        </select>-->
+                                        <div id="keyword_style"></div>
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">描述</label>
+                                    <div class="layui-input-block">
+<!--                                            <select name="description_style" lay-verify="required" lay-reqText="描述对于优化同样重要">-->
+<!--                                                <option value=""></option>-->
+<!--                                                <option value="0">{主关键词}{文章正文}</option>-->
+<!--                                                <option value="2">主关键词随机插入正文</option>-->
+<!--                                                <option value="3">{主关键词}</option>-->
+<!--                                                <option value="4">{来自描述文件}</option>-->
+<!--                                            </select>-->
+                                        <div id="description_style"></div>
+                                        </div>
+                                </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">TDK方式</label>
+                                <div class="layui-input-block">
+                                    <select name="tdk_encode">
+                                        <option  value="">请选择</option>
+                                        <option  value="ascii">ASCII</option>
+                                        <option  value="unicode">UNICODE</option>
+                                        <option  value="none">None</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label title">TDK范围</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" id="tdk_encode_style" name="tdk_encode_style[]" title="Title" value="title">
+                                    <input type="checkbox" id="tdk_encode_style" name="tdk_encode_style[]" title="Keyword" value="keyword">
+                                    <input type="checkbox" id="tdk_encode_style" name="tdk_encode_style[]" title="Description" value="description">
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label title">文章库</label>
+                                <div class="layui-input-block">
+                                    <select name="article_source" id="project_article" lay-filter="required" lay-reqtext="请选择文章表~">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label title">标题库</label>
+                                <div class="layui-input-block">
+                                    <select name="title_source" id="project_title" lay-filter="required" lay-reqtext="请选择标题表~">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label title">图片</label>
+                                <div class="layui-input-block">
+                                    <select name="pic_source" id="project_pic" lay-filter="required" lay-reqtext="请选择图片源~">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label title" style="width: 100px;">页面语言(*)</label>
+                                <div class="layui-input-block" style="margin-left: 110px;">
+                                    <input type="text" name="page_language" placeholder="页面语言" lay-reqtext="页面语言不能为空~" value="" autocomplete="off" class="layui-input" style="width: 100px; display: inline-block;">
+                                    <!-- https://www.w3schools.com/tags/ref_language_codes.asp 这里有全部的ISO代码 符合这里即可 -->
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">模板混淆</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="encode_style[]" title="class混淆" value="class">
+                                    <input type="checkbox" name="encode_style[]" title="id混淆" value="id">
+                                    <input type="checkbox" name="encode_style[]" title="标签混淆" value="tag">
+                                </div>
+                                <div class="layui-form-mid layui-word-aux" id="encode_style_tips">模板混淆后，起到一定的防K作用</div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">页面压缩</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="page_compress" lay-skin="switch" lay-text="ON|OFF" checked>
+                                </div>
+                                <div class="layui-form-mid layui-word-aux">压缩过的页面比原体积小 搜索引擎更喜欢</div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">禁止快照</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="disable_snapshots" lay-skin="switch" lay-text="ON|OFF" checked=""/>
+                                </div>
+                                <div class="layui-form-mid layui-word-aux">快照禁止后在搜索引擎无法演示快照内容，但不影响排名</div>
+                            </div>
+                    </div>
+                    </div>
+                    <!-- 内链URL设置 -->
+                    <div class="layui-tab-item">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" pane>快速规则</label>
+                            <div class="layui-input-block">
+                                <select name="quick_rules" lay-filter="quick_rules">
+                                </select>
+                            </div>
+                        </div>
+                            <div class="layui-form-item layui-form-text">
+                                <label class="layui-form-label">URL规则</label>
+                                <div class="layui-input-block">
+                                    <textarea name="ilink_rules" id="url_rules" required  lay-verify="required" lay-reqText="URL规则必须填写" placeholder="一行代表一个规则 标签参照下方提示" class="layui-textarea" style="height: 200px;"></textarea>
+                                </div>
+                            </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label title"  style="">标签提示</label>
+                            <div class="layui-input-block">
+                                <blockquote class="layui-elem-quote layui-quote-nm">
+                                    字符标签：{数字}、{字母}、{大写字母}、{大小写字母}、{大写字母数字}、{大小写字母数字}、{数字字母}、{随机字符}<br/>
+                                    时间标签：{日期}、{年}、{月}、{日}、{时}、{分}、{秒}<br/>
+                                    动态标签：数字和字母标签后面加数字是位数，如： {数字8}表示8个数字、{数字1-8}示随机1-8个数字
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 外链设置 -->
+                    <div class="layui-tab-item">
+                        <div class="layui-form">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" pane>外链类别</label>
+                                <div class="layui-input-block">
+                                    <select name="elink_class" lay-verify="required" lay-reqText="外链对于SEOer也是重要的哦">
+                                        <option value=""></option>
+                                        <option value="0">使用系统外链</option>
+                                        <option value="1">使用自定义外链表</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item layui-form-text">
+                                <label class="layui-form-label">自定义外链</label>
+                                <div class="layui-input-block">
+                                    <textarea name="elink_rules" id="flink_rule" placeholder="一行代表一个规则" class="layui-textarea" style="height: 200px;"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 缓存设置 -->
+                    <div class="layui-tab-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" pane>缓存开关</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="cache_option" lay-skin="switch" lay-filter="cache_on" lay-text="开启|关闭" checked>
+                                </div>
+                                <div class="layui-form-mid layui-word-aux">缓存关闭后页面将动态更新</div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" pane>缓存方法</label>
+                                <div class="layui-input-inline">
+                                    <select name="cache_type" id="cache_class" lay-filter="cache_class">
+                                        <option value="">请选择</option>
+                                        <optgroup label="局部缓存">
+                                            <option value="0">缓存TKD</option>
+                                            <option value="1" selected>缓存TKDB</option>
+                                        </optgroup>
+                                        <optgroup label="全局缓存">
+                                            <option value="2">全部缓存</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="layui-form-mid layui-word-aux" id="cache_tips">请选择缓存方法</div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">缓存周期</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="cache_expires" id="cache_expires" required  lay-verify="required|number" placeholder="请输入缓存周期，0为无限期" autocomplete="off" value="0" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-word-aux" id="cache_expires_tips">单位：天 如果大于缓存有效期则会强制删除缓存</div>
+                            </div>
+                        </div>
+                    <!-- 广告设置 -->
+                    <div class="layui-tab-item">
+                        <div class="layui-form-pane">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">地区屏蔽</label>
+                            <div class="layui-input-block">
+                                <input type="checkbox" name="ban_location_option" lay-skin="switch" lay-text="开启|关闭">
+                            </div>
+                            <div class="layui-form-mid layui-word-aux" id="ban_location_opt">开启后会在跳转的页面进行地区判断</div>
+                        </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">地 区</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="ban_location"  placeholder="请输入被屏蔽的地区 如北京|上海等" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-form-mid layui-word-aux" id="ban_location_tips">被屏蔽的地区会显示404错误页面</div>
+                            </div>
+<!--                            <div class="layui-form-item">-->
+<!--                                <label class="layui-form-label">404 页</label>-->
+<!--                                <div class="layui-input-block">-->
+<!--                                    <input type="text" name="error_page" placeholder="网站的404错误页" autocomplete="off" class="layui-input">-->
+<!--                                </div>-->
+<!--                            </div>-->
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">广告JS</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="ad_js" required  lay-reqText="你还没有填写js地址" lay-verify="required|url" placeholder="https://www.example.com/advertise.js" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">错误页</label>
+                                <div class="layui-input-block">
+                                    <textarea name="error_page" id="error_page" required lay-reqText="错误页必填" placeholder="可以自定义一个错误页" class="layui-textarea" style="height: 200px;">
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL {$path}  was not found on this server.</p>
+</body></html>
+</textarea>
+                                </div>
+                        </div>
+
+
+                    </div>
+                    </div>
+                    <!-- 推送设置 -->
+                    <div class="layui-tab-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" pane>神马推送</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="shenma_push" lay-skin="switch" lay-filter="shenma_push" lay-text="开启|关闭">
+                                </div>
+                                <div class="layui-form-mid layui-word-aux">把URL提交给神马搜索引擎，加快搜录</div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">神马Token</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="shenma_push_token" placeholder="神马推送token 需在神马站长平台获取" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" pane>百度推送</label>
+                                <div class="layui-input-block">
+                                    <input type="checkbox" name="baidu_push" lay-skin="switch" lay-filter="baidu_push" lay-text="开启|关闭">
+                                </div>
+                                <div class="layui-form-mid layui-word-aux">把URL提交给百度搜索引擎，加快搜录</div>
+                            </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">百度Token</label>
+                                <div class="layui-input-block">
+                                    <input type="text" name="baidu_push_token" placeholder="百度推送token 需在百度站长平台获取" autocomplete="off" class="layui-input">
+                                </div>
+                            </div>
+                        </div>
+                    <!-- 异常报告 -->
+                    <div class="layui-tab-item">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" pane>跳转异常</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="jump_exception" lay-skin="switch" lay-filter="baidu_push" lay-text="开启|关闭">
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">模拟跳转，获取返回结果 如有异常将会推送到已配置好的“消息通知”</div>
+                        </div>
+                            <div class="layui-form-item">
+                            <label class="layui-form-label" pane>模拟异常</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="spider_exception" lay-skin="switch" lay-filter="baidu_push" lay-text="开启|关闭">
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">模拟抓取，获取返回结果 如有异常将会推送到已配置好的“消息通知”</div>
+
+                        </div>
+                            <div class="layui-form-item">
+                                <label class="layui-form-label" pane>网站异常</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="website_exception" lay-skin="switch" lay-filter="baidu_push" lay-text="开启|关闭">
+                                </div>
+                                <div class="layui-form-mid layui-word-aux">网站异常，如 502 404 或链接错误将会推送到已配置好的“消息通知”</div>
+                            </div>
+                    </div>
+                        <div class="layui-row layui-col-space10">
+                            <div class="layui-col-md5" style="padding-left: 40%;">
+                                <button class="layui-btn layui-btn-lg layui-btn-radius layui-btn-normal" lay-submit lay-filter="project-add">创建项目</button>
+                            </div>
+                        </div>
+                    </form>
+            </div>
+<!--    </div>-->
+</div>
+        </div>
+        <div class="modal fade" id="delete-project" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="deleteModalLabel">删除项目</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <span class="message-tips"> 正在删除项目：<b id="project_url" style="color: #f00b0d;"></b></span>
+                            <div class="message-bodys">
+                                <span class="message-tips">删除项目后蜘蛛缓存、广告跳转、页面监控失效</span>
+                                <span class="message-tips">如需暂时停止项目在、编辑项目中设置状态为<b style="font-size: large;color: #00be67">关闭</b>即可，或者：</span>
+                                <span class="message-tips"> 在下方输入框输入“<b style="font-size: large; color: #0a8ddf;">确认删除</b>”方可删除项目。</span>
+                            </div>
+                        </div>
+                            <div class="form-group" style="margin-top: 20px;">
+                                <label for="recipient-name" class="control-label">确认信息:</label>
+                                <input type="text" class="form-control" placeholder="确认删除" id="recipient-name">
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" id="confirm-delete">确定删除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</block>
+
+<block name="js">
+    <script src="__PUBLIC__/statics/xm-select/xm-select.js"></script>
+    <script>
+
+        // 多项目添加url
+        $('#batch').on('click',function(){
+            $('#singe-project').hide();
+            $('#mult-project').show();
+            $('#mult-option').val("1");
+        })
+        // 监听批量添加
+
+        var keyword_style = xmSelect.render({
+            el: '#keyword_style',
+            toolbar:{
+                show: true,
+            },
+            autoRow: true,
+            height: '500px',
+            name : 'keyword_style',
+            layVerify: 'required',
+            layVerType: 'msg',
+            tips: '可选择多个关键词样式 程序随机调用',
+            data: [
+                {name: '主关键词', value: 1},
+                {name: '主关键词,关联关键词', value: 2},
+                {name: '主关键词,关联关键词1,关联关键词2', value: 3},
+                {name: '随机关键词', value: 4},
+            ]
+        })
+
+        var description_style = xmSelect.render({
+            el: '#description_style',
+            toolbar:{
+                show: true,
+            },
+            autoRow: true,
+            height: '500px',
+            name:'description_style',
+            layVerify: 'required',
+            layVerType: 'msg',
+            tips: '可选择多个描述样式 程序随机调用',
+            data: [
+                {name: '主关键词+文章正文', value: 1},
+                {name: '主关键词随机插入正文', value: 2},
+                {name: '主关键词', value: 3},
+                {name: '随机关键词堆砌', value: 4},
+                {name: '来自描述文件', value: 5},
+            ]
+        })
+
+        var title_style = xmSelect.render({
+            el: '#title_style',
+            toolbar:{
+                show: true,
+            },
+            layVerify: 'required',
+            layVerType: 'msg',
+            tips: '可选择多个标题样式 程序随机调用',
+            autoRow: true,
+            height: '500px',
+            name:'title_style',
+            data: [
+                {name: '主关键词', value: 1},
+                {name: '主关键词 - 副标题', value: 2},
+                {name: '主关键词 - 关联关键词', value: 3},
+                {name: '主关键词 -关联关键词1-关联关键词2', value: 4},
+                {name: '主关键词:文章标题', value: 5},
+            ]
+        })
+
+        layui.element.on('tab(add-project-tab)', function(data){
+            $(".layui-tab-item").each(function (item) {
+                $(this).removeClass('layui-show');
+                if(item === data.index){
+                    $(this).addClass('layui-show');
+                }
+            });
+
+            $('.layui-tab-content').css('height', 'auto');
+        });
+
+        // 查看缓存数量
+        $("a[name='cache-total']").on('click',function(){
+            var siteId = $(this).attr('data-site-id');
+            var obj = $(this);
+             $.post("{:U('platform/project/table?action=cache_cat')}",{siteId:siteId},function (res){
+                 obj.text(res);
+             })
+            //console.log(siteId);
+        })
+
+
+        $("#confirm-delete").on('click',function (){
+            text = $("#recipient-name").val();
+            if(text != "确认删除"){
+                alert("请确认删除！")
+            }
+        })
+
+        // 提交表单事件
+        layui.form.on('submit(project-add)', function(data){
+            var _data = data.field;
+            var url = /^(http|https)\:\/\/(.*?)/;
+            // 多项目url添加
+            if(_data.mult_option == '1'){
+                var urls = String(_data.mult_project_url);
+                var list = urls.split("\n");
+                $.each(list,function(index,value){
+                    if(!url.exec(value)){
+                        layer.msg(value + '不是一个合法的url!')
+                        return false;
+                    }
+                })
+            }else if(_data.mult_option == '0') {
+                var urls = String(_data.singe_project_url);
+                if (!url.exec(urls)) {
+                    layer.msg(urls + '不是一个合法的url!')
+                    return false;
+                }
+            }
+            layer.load(5, { shade: [0.5, "#5588AA"] });
+            $.ajax({
+                url:'{:U(\'platform/project/table?action=add\')}',
+                type:'post',
+                data:_data,
+                success:function(result){
+                    if(result.code == 200) {
+                        layer.closeAll("loading");
+                        layer.msg(result.msg, {icon: 16, time: 3000},function(){
+                            layer.closeAll("open");
+                            window.location.reload();
+                        })
+                    }
+
+                    if(result.code == 404) {
+                        layer.closeAll("loading");
+                        layer.msg(result.msg);
+                    }
+                },error: function (xhr, ajaxOptions, thrownError) {
+                    console.log(xhr);
+                    layer.closeAll("loading");
+                }
+            });
+            return false;
+        });
+
+        $("a[name='seo-data']").click(function(){
+            host = $(this).attr('data-domain');
+
+            layer.open({
+                type: 2 //Page层类型
+                ,area: ['60%', '60%']
+                ,title: '正在查看' + host + '的SEO数据'
+                ,shade: 0.6 //遮罩透明度
+                ,maxmin: true //允许全屏最小化
+                ,anim: 1 //0-6的动画形式，-1不开启
+                ,content: '{:U("platform/Project/show_data")}' + "&domain=" + host
+            });
+        });
+        // 选择快速规则
+        layui.form.on('select(quick_rules)', function(data){
+            $.ajax({
+                url : '{:U("Platform/Project/url_rules?action=get")}',
+                type : 'post',
+                data : {ur_id:data.value},
+                success : function(das){
+                    if(das.code == 200) {
+                        $("#url_rules").empty();
+                        $("#url_rules").val(das.data);
+                    }else{
+                        alert('该条ID规则可能已删除，无法获取！')
+                    }
+                },
+            });
+        });
+        // 缓存开启与关闭
+        layui.form.on('switch(cache_on)', function(data){
+            // console.log(data);
+            // var cache_on = $("#cache_on").prop("checked")
+            if(this.checked){
+                $("#cache_class").removeAttr("disabled");
+                $("#cache_expires").removeAttr("disabled");
+                layui.form.render('select');
+                console.log("开启")
+            }else{
+                $("#cache_class").attr("disabled","disabled");
+                $("#cache_expires").attr("disabled","disabled");
+                layui.form.render('select');
+                $("#cache_tips").text('已禁用缓存');
+                $("#cache_expires_tips").text('已禁用缓存');
+            }
+        });
+
+        layui.form.on('select(cache_class)', function(data){
+            // console.log(data);
+            // var cache_on = $("#cache_on").prop("checked")
+            switch (data.value) {
+                case "0":
+                    $("#cache_tips").text('仅缓存标题、关键词、描述。')
+                    break;
+                 case "1":
+                     $("#cache_tips").text('仅缓存标题、关键词、描述、内容')
+                 break;
+                 case "2":
+                      $("#cache_tips").text('缓存页面的所有内容')
+                 break;
+                default:
+                    $("#cache_tips").text('请选择缓存方法')
+                    break;
+
+            }
+        });
+
+        $("a[name='ViewSite']").on('click',function () {
+            sid = $(this).attr('data-site-sid');
+
+            layer.open({
+                type: 2 //Page层类型
+                ,area: ['858px', '80%']
+                ,title: '编辑项目'
+                ,shade: 0.6 //遮罩透明度
+                ,maxmin: true //允许全屏最小化
+                ,anim: 1 //0-6的动画形式，-1不开启
+                ,content: '{:U("platform/Project/table?action=view")}' + "&sid=" + sid,
+                scrollbar: true
+            });
+        })
+        // 编辑事件
+
+        $("a[name='DeleteSite']").click(function(event) {
+            xsid = $(this).attr('data-site-sid');
+            del_host = $(this).attr('data-domain');
+            $("#project_url").text(del_host);
+            $("#delete-project").modal('show');
+
+        });
+        // 添加菜单
+        function add() {
+            // 词库select
+            $("select[name='article_source']").append('<option value="">请选择</option>');
+            $("select[name='title_source']").append('<option value="">请选择</option>');
+            $("select[name='pic_source']").append('<option value="">请选择</option>');
+            $.ajax(({
+                url:'{:U("Platform/ProjectApi/mix")}',
+                type:'get',
+                dataType:'json',
+
+                success: function(response) {
+                    // 处理成功响应
+                    // 解析返回的JSON数据
+                    const contentData = JSON.parse(response.data.content);
+                    const picData = JSON.parse(response.data.pic);
+                    const templateData = response.data.template;
+                    const keywordData = response.data.keyword;
+
+                    // 渲染article选择框
+                    $.each(contentData.article, function(index, item) {
+                        $("select[name='article_source']").append('<option value="' + item.table + '">' + item.table + '</option>');
+
+                    });
+
+                    // 渲染title选择框
+                    $.each(contentData.title, function(index, item) {
+                        $("select[name='title_source']").append('<option value="' + item.table + '">' + item.table + '</option>');
+                    });
+
+                    $.each(picData, function(index, item) {
+                        $("select[name='pic_source']").append('<option value="' + item + '">' + item + '</option>');
+
+                    });
+
+                    const template_selector = xmSelect.render({
+                        el: '#project_template',
+                        data : templateData,
+                        name :'project_template',
+                        layVerify: 'required',
+                        layVerType: 'msg',
+                        tips: '可选择多个模板 随机调用'
+                    })
+
+                    const keyword_selector = xmSelect.render({
+                        el: '#kw_group',
+                        data : keywordData,
+                        name :'project_keyword',
+                        layVerify: 'required',
+                        layVerType: 'msg',
+                        tips: '可选择多个词库 随机调用'
+                    })
+
+
+                    layui.form.render('select');
+
+
+                },
+                error: function(xhr, status, error) {
+                    // 处理错误
+                    console.log("Error: " + error);
+                }
+            }))
+
+
+
+
+
+            // 快速链接规则
+            $("select[name='quick_rules']").empty();
+            layui.form.render('select','quick_rules');
+            $.ajax({
+                url:'{:U("Platform/Project/url_rules?action=list")}',
+                type:"post",
+                cache: false,
+                error:function(){
+                    alert('加载出错，请检查URL链接规则配置！');
+                    return false;
+                },
+                success:function(data) {
+                    if (data.code == 500) {
+                        alert('加载出错，请检查URL链接规则配置！');
+                        return false;
+                    }
+
+                    if (data.code == 200) {
+                        var modelList = data.data;
+                        if (modelList && modelList.length != 0) {
+                            var option = "<option value=''></option>";
+                            for (var i = 0; i < modelList.length; i++) {
+                                option +="<option value=\""+modelList[i].ur_id+"\">"+ modelList[i].ur_name + "</option>";
+                            }
+                            $("select[name='quick_rules']").append(option);
+                            layui.form.render('select','quick_rules');
+
+                        }
+                    }
+                }
+        });
+
+            var add_project = layer.open({
+                type: 1,
+                title: '创建单例项目 —— 你只管做，其他的交给我',
+                shadeClose: true,
+                shade: false,
+                maxmin: true, //开启最大化最小化按钮
+                area: ['858px', '80%'],
+                maxWidth:'650px',
+                content: $("#create-project")
+            });
+        }
+
+    </script>
+</block>

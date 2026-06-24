@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <title>SEO管控平台系统登陆 - SEO Work Platform System V {$license.version}</title>
+    <Meta http-equiv="Content-Language" Content="zh-CN">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keyword" content="seo工作平台,seo Platform,黑帽seo,白帽seo,灰帽seo" />
+    <meta name="description" content="适用于网站优化工作人员" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta name="author" content="SEO Killer Team Inc." />
+    <meta name="copyright" content="{$license.version}"/>
+    <meta property="og:title" content="SEO管控平台系统登陆" class="next-head" class="next-head"/>
+    <meta property="og:site_name" content="SEO管控平台系统登陆" class="next-head" class="next-head"/>
+    <meta property="og:image" content="./public/logo.jpg"/>
+    <meta property="og:type" content="website">
+    <meta name="robots" content="noindex, nofollow">
+    <meta property="og:description" content="SEO管控平台系统登陆 - SEO Work Platform System V {$license.version}" class="next-head"/>
+    <meta property="twitter:title" content="SEO管控平台系统登陆" class="next-head"/>
+    <meta property="twitter:site" content="SEO管控平台系统登陆" class="next-head"/>
+    <meta property="twitter:card" content="summary_large_image" class="next-head"/>
+    <meta property="twitter:description" content="SEO管控平台系统登陆 - SEO Work Platform System V {$license.version}" class="next-head"/>
+    <meta name="robots" content="nofollow" class="next-head"/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!--/Style-CSS -->
+    <logincss />
+    <!--//Style-CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/layui@2.6.8/dist/css/layui.css"/>
+    <script src="https://unpkg.com/jquery@3.4.1/dist/jquery.min.js"></script>
+    <script src="https://recaptcha.net/recaptcha/api.js" async defer></script>
+</head>
+<body>
+
+<!-- form section start -->
+<section class="w3l-hotair-form">
+    <h1>SEO Work Platform <span style="font-size: 12px; transform: scale(2);">{$license.version}</span></h1>
+    <div class="container">
+        <!-- /form -->
+        <div class="workinghny-form-grid">
+            <div class="main-hotair">
+                <div class="content-wthree">
+                    <h2>Log In</h2>
+                    <form action="" method="post" id="form_login">
+                        <input type="text" class="text" name="username" id="loginName" placeholder="ID" required="" autofocus>
+                        <input type="password" class="password" name="password" id="loginPwd" placeholder="password" required="" autofocus>
+                        <div class="g-recaptcha" data-sitekey="{$pubkey}" style="	transform:scale(0.77); -webkit-transform:scale(0.77); transform-origin:0 0; -webkit-transform-origin:0 0;"></div>
+                        {__TOKEN__}
+                        <button class="btn" type="submit">Log In</button>
+                    </form>
+                </div>
+                <div class="w3l_form align-self">
+                    <div class="left_grid_info">
+                        <img src="./public/statics/login/images/bg.png" alt="" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- //form -->
+    </div>
+    <!-- copyright-->
+    <div class="copyright text-center">
+        <p class="copy-footer-29">© 2024 SEO Killer Team. All rights reserved.</p>
+    </div>
+    <!-- //copyright-->
+</section>
+<!-- //form section start -->
+<script type="text/javascript">
+    $('#form_login').submit(function(event) {
+        event.preventDefault();
+        if ($("input[name='username']").val() == '') {
+            layer.msg('请填写帐号后在提交', {icon: 2, time: 700});
+            return false;
+        }
+
+        if ($("input[name='password']").val() == '') {
+            layer.msg('请填写密码后在提交', {icon: 2, time: 700});
+            return false;
+        }
+        var verify = $("textarea[name='g-recaptcha-response']").val();
+
+        if (verify.length <= 0) {
+            layer.msg('请完成人机验证', {icon: 2, time: 700});
+            return false;
+        }
+
+        i_username = $("input[name='username']").val();
+        i_password = $("input[name='password']").val();
+        i_verify = $("input[name='verify']").val();
+
+        auth = {
+            username: i_username,
+            password: i_password,
+            recaptcha: verify
+        };
+
+        $.post("{:U('login/index/index')}", auth, function (data) {
+            // 失败
+            if (data.code === 404) {
+                layer.msg(data.msg, {icon: 2, time: 1000},function(){
+                    // 不管是验证码错误还是密码错误 都需要重写获取验证码
+                    grecaptcha.reset();
+                });
+                return false;
+            }
+            // 成功
+            if(data.code === 200){
+                layer.msg(data.msg, {icon: 16, time: 3000},function(){
+                    window.location.href = data.redirect;
+                })
+            }
+        });
+    });
+</script>
+</body>
+<script src="https://unpkg.com/layui@2.6.8/dist/layui.js"></script>
+</html>
+
+

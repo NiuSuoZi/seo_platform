@@ -1,0 +1,595 @@
+<link rel="stylesheet" href="https://cdn.staticfile.org/layui/2.6.8/css/layui.min.css" />
+<div class="layui-tab layui-tab-card" lay-filter="edit-project-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this"><i class="layui-icon layui-icon-username"></i> 基础信息</li>
+        <li><i class="layui-icon layui-icon-set"></i> SEO选项</li>
+        <li><i class="layui-icon layui-icon-website"></i> 内链设置</li>
+        <li><i class="layui-icon layui-icon-link"></i> 外链设置</li>
+        <li><i class="layui-icon layui-icon-print"></i> 缓存设置</li>
+        <li><i class="layui-icon layui-icon-rmb"></i> 广告设置</li>
+        <li><i class="layui-icon layui-icon-note"></i> 推送设置</li>
+        <li><i class="layui-icon layui-icon-layer"></i> 其他设置</li>
+    </ul>
+    <div class="layui-tab-content" style="height: 450px;">
+        <form class="layui-form" action="{:U('platform/project/table?action=edit')}" method="post" lay-verify="project-edit">
+            <div class="layui-tab-item layui-show">
+                <div class="layui-form-pane">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" pane>项目类型</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="project_type" value="<?php echo($type_info[$data['site_type']]);?>" disabled class="layui-input">
+
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">项目状态</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" name="project_status" lay-skin="switch" lay-text="ON|OFF" <?php if($data['project_status'] == 0):?> checked<?php endif;?>/>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">项目标识</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="project_name" required value="<?php echo($data['project_name']);?>" lay-verify="required" lay-reqText="项目标识必须填写" placeholder="新的项目" autocomplete="on" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">项目地址</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="project_url"  value="<?php echo($data['project_url']);?>" disabled  class="layui-input"/>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">项目备注</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="rankname" required  lay-verify="required" value="<?php echo($data['rankname']);?>" placeholder="请输入項目备注" lay-reqText="项目备注必须填写" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">项目监控</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" name="monitor_status" lay-skin="switch" lay-text="开启|关闭"<?php if($data['monitor_status'] == 0):?> checked <?php endif;?> >
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">开启项目监控后，在“其他设置”选项中配置监控内容</div>
+
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">网站编码</label>
+                        <div class="layui-input-block">
+                            <select name="project_charset" lay-verify="required" lay-reqText="请选择网站编码~">
+                                <option value=""></option>
+                                <?php if($data['project_charset'] == 0):?>
+                                <option value="0" selected>UTF-8</option>
+                                <option value="1">GBK</option>
+                                <?php else:?>
+                                <option value="0">UTF-8</option>
+                                <option value="1" selected>GBK</option>
+                                <?php endif;?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>  <!-- 优化设置 -->
+            <div class="layui-tab-item">
+                <div class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">词 库</label>
+                        <div class="layui-input-block">
+                            <div id="v_kw_group"></div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模 板</label>
+                        <div class="layui-input-block">
+                            <div id="v_project_template"></div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" pane>标题</label>
+                        <div class="layui-input-block">
+                            <div id="v_title_style"></div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" pane>关键词</label>
+                        <div class="layui-input-block">
+                            <div id="v_keyword_style"></div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">描述</label>
+                        <div class="layui-input-block">
+                            <div id="v_description_style"></div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">TDK方式</label>
+                        <div class="layui-input-block">
+                            <select name="tdk_encode">
+                                <option  value="">请选择</option>
+                                <option  value="ascii">ASCII</option>
+                                <option  value="unicode">UNICODE</option>
+                                <option  value="none">None</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label title">TDK范围</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" id="tdk_encode_style" name="tdk_encode_style[]" title="Title" value="title">
+                            <input type="checkbox" id="tdk_encode_style" name="tdk_encode_style[]" title="Keyword" value="keyword">
+                            <input type="checkbox" id="tdk_encode_style" name="tdk_encode_style[]" title="Description" value="description">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label title">文章库</label>
+                        <div class="layui-input-block">
+                            <select name="article_source" id="project_article" lay-filter="required" lay-reqtext="请选择文章表~">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label title">标题库</label>
+                        <div class="layui-input-block">
+                            <select name="title_source" id="project_title" lay-filter="required" lay-reqtext="请选择标题表~">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label title">图片</label>
+                        <div class="layui-input-block">
+                            <select name="pic_source" id="project_pic" lay-filter="required" lay-reqtext="请选择图片源~">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label title"  style="">页面语言(*)</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="page_language"  placeholder="页面语言" lay-verify="required" lay-reqtext="页面语言不能为空~" value="<?php echo($data['seo_option']['page_language']);?>" autocomplete="off" class="layui-input" style="width: 80px;">
+                            <!-- https://www.w3schools.com/tags/ref_language_codes.asp 这里有全部的ISO代码 符合这里即可 -->
+                        </div>
+                    </div>
+
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">模板混淆</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" id="encode_style" name="encode_style[]" title="class混淆" value="class">
+                            <input type="checkbox" id="encode_style" name="encode_style[]" title="name混淆" value="name">
+                            <input type="checkbox" id="encode_style" name="encode_style[]" title="标签混淆" value="tag">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux" id="v_encode_style_tips">模板混淆后，起到一定的防K作用</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">页面压缩</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="page_compress" lay-skin="switch" lay-text="ON|OFF"<?php if($data['seo_option']['page_compress'] == 'on'):?> checked<?php endif;?>/>
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">压缩过的页面比原体积小 搜索引擎更喜欢</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">禁止快照</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="disable_snapshots" lay-skin="switch" lay-text="ON|OFF" <?php if($data['seo_option']['disable_snapshots'] == 'on'):?> checked<?php endif;?>/>
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">快照禁止后在搜索引擎无法演示快照内容，但不影响排名</div>
+                    </div>
+                </div>
+            </div>
+            <!-- 内链URL设置 -->
+            <div class="layui-tab-item">
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">URL规则</label>
+                    <div class="layui-input-block">
+                        <textarea name="ilink_rules" id="v_url_rules" placeholder="一行代表一个规则 标签参照下方提示" class="layui-textarea" style="height: 200px;"><?php echo($data['ilink_rules']);?></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label title" style="">标签提示</label>
+                    <div class="layui-input-block">
+                        <blockquote class="layui-elem-quote layui-quote-nm">
+                            字符标签：{数字}、{字母}、{大写字母}、{大小写字母}、{大写字母数字}、{大小写字母数字}、{数字字母}、{随机字符}<br/>
+                            时间标签：{日期}、{年}、{月}、{日}、{时}、{分}、{秒}<br/>
+                            动态标签：数字和字母标签后面加数字是位数，如： {数字8}表示8个数字、{数字1-8}示随机1-8个数字
+                        </blockquote>
+                    </div>
+                </div>
+            </div>
+            <!-- 外链设置 -->
+            <div class="layui-tab-item">
+                <div class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" pane>外链类别</label>
+                        <div class="layui-input-block">
+                            <select name="elink_class" lay-verify="required" lay-reqText="外链对于SEOer也是重要的哦">
+                                <option value=""></option>
+                                <?php if($data['elink_option']['elink_class'] == 0):?>
+                                <option value="0" selected>使用系统外链</option>
+                                <option value="1">使用自定义外链表</option>
+                                <?php else:?>
+                                <option value="0">使用系统外链</option>
+                                <option value="1" selected>使用自定义外链表</option>
+                                <?php endif;?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">自定义外链</label>
+                        <div class="layui-input-block">
+                            <textarea name="elink_rules" id="v_flink_rule" placeholder="一行代表一个规则" class="layui-textarea" style="height: 200px;"><?php echo($data['elink_rules']);?></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 缓存设置 -->
+            <div class="layui-tab-item">
+                <div class="layui-form-item">
+                    <label class="layui-form-label" pane>缓存开关</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="cache_on" lay-skin="switch" lay-filter="cache_on" lay-text="开启|关闭" <?php if($data['cache_option']['cache_on'] == 'on'):?> checked<?php endif;?>>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">缓存关闭后页面将动态更新</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" pane>缓存方法</label>
+                    <div class="layui-input-inline">
+                        <select name="cache_type" id="v_cache_class" lay-filter="cache_class">
+                            <option value="">请选择</option>
+                            <optgroup label="局部缓存">
+                                <option value="0">缓存TKD</option>
+                                <option value="1">缓存TKDB</option>
+                            </optgroup>
+                            <optgroup label="全局缓存">
+                                <option value="2">全部缓存</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux" id="v_cache_tips">请选择缓存方法</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">缓存周期</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="cache_expires" id="v_cache_expires" value="<?php echo($data['cache_option']['cache_expires']);?>" required  lay-verify="required|number" placeholder="请输入缓存周期，0为无限期" autocomplete="off" value="0" class="layui-input">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux" id="v_cache_expires_tips">单位：天 如果大于缓存有效期则会强制删除缓存</div>
+                </div>
+            </div>
+            <!-- 广告设置 -->
+            <div class="layui-tab-item">
+                <div class="layui-form-pane">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">地区屏蔽</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" name="ban_location_option" lay-skin="switch" lay-text="开启|关闭" <?php if($data['advert_option']['ban_location_option'] == 'on'):?> checked<?php endif;?>>
+                        </div>
+                        <div class="layui-form-mid layui-word-aux" id="v_ban_location_opt">开启后会在跳转的页面进行地区判断</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">地 区</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="ban_location"  value="<?php echo $data['advert_option']['ban_location'];?>" placeholder="请输入被屏蔽的地区 如北京|上海等" autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-word-aux" id="v_ban_location_tips">被屏蔽的地区会显示404错误页面</div>
+                    </div>
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">404 页</label>-->
+<!--                        <div class="layui-input-block">-->
+<!--                            <input type="text" name="error_page"  value="<?php echo $data['advert_option']['error_page'];?>" placeholder="网站的404错误页" autocomplete="off" class="layui-input">-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">广告JS</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="ad_js" value="<?php echo $data['advert_option']['ad_js'];?>" required  lay-reqText="你还没有填写js地址" lay-verify="required|url" placeholder="https://www.example.com/advertise.js" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">错误页</label>
+                        <div class="layui-input-block">
+                                    <textarea name="error_page" id="error_page" required lay-reqText="错误页必填" placeholder="可以自定义一个错误页" class="layui-textarea" style="height: 200px;">
+<?php echo $data['advert_option']['error_page'];?>
+</textarea>
+
+                </div>
+            </div>
+                </div>
+            </div>
+            <!-- 推送设置 -->
+            <div class="layui-tab-item">
+                <div class="layui-form-item">
+                    <label class="layui-form-label" pane>神马推送</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="shenma_push" lay-skin="switch" lay-filter="shenma_push" lay-text="开启|关闭" <?php if($data['push_option']['shenma_push'] == 'on'):?> checked<?php endif;?>>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">把URL提交给神马搜索引擎，加快搜录</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">神马Token</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="shenma_push_token" placeholder="神马推送token 需在神马站长平台获取" value="<?php echo($data['push_option']['shenma_push_token']);?>" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label" pane>百度推送</label>
+                    <div class="layui-input-block">
+                        <input type="checkbox" name="baidu_push" lay-skin="switch" lay-filter="baidu_push" lay-text="开启|关闭" <?php if($data['push_option']['baidu_push'] == 'on'):?> checked<?php endif;?>>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">把URL提交给百度搜索引擎，加快搜录</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">百度Token</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="baidu_push_token" placeholder="百度推送token 需在百度站长平台获取" autocomplete="off" value="<?php echo($data['push_option']['baidu_push_token']);?>" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <!-- 异常报告 -->
+            <div class="layui-tab-item">
+                <div class="layui-form-item">
+                    <label class="layui-form-label" pane>跳转异常</label>
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="jump_exception" lay-skin="switch" lay-filter="baidu_push" lay-text="开启|关闭" <?php if($data['other_option']['jump_exception'] == 'on'):?> checked<?php endif;?>>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">模拟跳转，获取返回结果 如有异常将会推送到已配置好的“消息通知”</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" pane>模拟异常</label>
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="spider_exception" lay-skin="switch" lay-filter="baidu_push" lay-text="开启|关闭" <?php if($data['other_option']['spider_exception'] == 'on'):?> checked<?php endif;?>>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">模拟抓取，获取返回结果 如有异常将会推送到已配置好的“消息通知”</div>
+
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" pane>网站异常</label>
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="website_exception" lay-skin="switch" lay-filter="baidu_push" lay-text="开启|关闭" <?php if($data['other_option']['website_exception'] == 'on'):?> checked<?php endif;?>>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">网站异常，如 502 404 或链接错误将会推送到已配置好的“消息通知”</div>
+                </div>
+            </div>
+            <div class="layui-row layui-col-space10">
+                <div class="layui-col-md5" style="padding-left: 40%;">
+                    <button class="layui-btn layui-btn-lg layui-btn-radius" lay-submit lay-filter="project-edit">保存项目</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+<script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.staticfile.org/layui/2.6.8/layui.min.js"></script>
+<script src="./public/statics/xm-select/xm-select.js"></script>
+<script type="text/javascript">
+
+    layui.element.on('tab(edit-project-tab)', function(data){
+
+        $(".layui-tab-item").each(function (item) {
+            $(this).removeClass('layui-show');
+            if(item === data.index){
+                $(this).addClass('layui-show');
+            }
+        });
+        $('.layui-tab-content').css('height', 'auto');
+    });
+
+    const template_selector = xmSelect.render({
+        el: '#v_project_template',
+        toolbar: {show: true},
+        theme: {
+            color: '#8799a3',
+        },
+        size: 'small',
+        data: [],
+        name: 'project_template'
+    });
+
+    const keyword_selector = xmSelect.render({
+        el: '#v_kw_group',
+        toolbar: {show: true},
+        theme: {
+            color: '#0081ff',
+        },
+        size: 'small',
+        data: [],
+        name: 'project_keyword'
+    });
+
+
+    function fetchConfiguredData() {
+        return $.ajax({
+            url: "{:U('platform/project/table?action=view&sid=')}{$Think.get.sid}",
+            type: "POST",
+            dataType: "json"
+        });
+    }
+
+    // 获取源数据
+    function fetchSourceData() {
+        return $.ajax({
+            url: '{:U("Platform/ProjectApi/mix")}',
+            type: 'GET',
+            dataType: 'json'
+        });
+    }
+
+    // 初始化数据
+    // 初始化数据
+    async function initializeData() {
+        try {
+            // 启动加载动画
+            layer.load(5, { shade: [0.5, "#5588AA"] });
+
+            // 获取并处理已配置的数据
+            const configuredData = await fetchConfiguredData();
+            reslut = configuredData.data;
+
+            if (reslut.seo_option.encode_style) {
+                encodeType = reslut.seo_option.encode_style.split(",");
+                encodeType.forEach(value => {
+                    $("input[id='encode_style'][value='" + value + "']").prop("checked", true);
+                });
+            }
+
+            $("select[name='tdk_encode']").val(reslut.seo_option.tdk_encode);
+
+            // 设置其他选项
+            var tdk_encode_style_Type = reslut.seo_option.tdk_encode_style ? reslut.seo_option.tdk_encode_style.split(",") : [];
+            tdk_encode_style_Type.forEach(value => {
+                $("input[id='tdk_encode_style'][value='" + value + "']").prop("checked", true);
+            });
+
+            var keyword_style = xmSelect.render({
+                el: '#v_keyword_style',
+                toolbar: {show: true},
+                autoRow: true,
+                size: 'small',
+                name: 'keyword_style',
+                layVerify: 'required',
+                layVerType: 'msg',
+                initValue: reslut.seo_option.keyword_style,
+                tips: '可选择多个关键词样式 程序随机调用',
+                data: [
+                    {name: '主关键词', value: 1},
+                    {name: '主关键词,关联关键词', value: 2},
+                    {name: '主关键词,关联关键词1,关联关键词2', value: 3},
+                    {name: '随机关键词', value: 4},
+                ]
+            });
+
+            var description_style = xmSelect.render({
+                el: '#v_description_style',
+                toolbar: {show: true},
+                autoRow: true,
+                size: 'small',
+                name: 'description_style',
+                layVerify: 'required',
+                layVerType: 'msg',
+                tips: '可选择多个描述样式 程序随机调用',
+                initValue: reslut.seo_option.description_style,
+                data: [
+                    {name: '主关键词+文章正文', value: 1},
+                    {name: '主关键词随机插入正文', value: 2},
+                    {name: '主关键词', value: 3},
+                    {name: '随机关键词堆砌', value: 4},
+                    {name: '来自描述文件', value: 5},
+                ]
+            });
+
+            var title_style = xmSelect.render({
+                el: '#v_title_style',
+                toolbar: {show: true},
+                layVerify: 'required',
+                layVerType: 'msg',
+                tips: '可选择多个标题样式 程序随机调用',
+                autoRow: true,
+                size: 'small',
+                name: 'title_style',
+                initValue: reslut.seo_option.title_style,
+                data: [
+                    {name: '主关键词', value: 1},
+                    {name: '主关键词 - 副标题', value: 2},
+                    {name: '主关键词 - 关联关键词', value: 3},
+                    {name: '主关键词 -关联关键词1-关联关键词2', value: 4},
+                    {name: '主关键词:文章标题', value: 5},
+                ]
+            });
+
+            template_selector.update({ initValue: reslut.seo_option.project_template });
+
+            keyword_selector.update({ initValue: reslut.keyword });
+
+            layui.form.render();
+
+            // 获取并处理源数据
+            const sourceData = await fetchSourceData();
+            const contentData = JSON.parse(sourceData.data.content);
+            const picData = JSON.parse(sourceData.data.pic);
+            const templateData = sourceData.data.template;
+            const keywordData = sourceData.data.keyword;
+
+            // 渲染 article 选择框
+            $.each(contentData.article, function(index, item) {
+                $("select[name='article_source']").append('<option value="' + item.table + '">' + item.table + '</option>');
+            });
+
+            if (reslut.article_source) {
+                $("select[name='article_source']").val(reslut.article_source);
+            }
+
+            // 渲染 title 选择框
+            $.each(contentData.title, function(index, item) {
+                $("select[name='title_source']").append('<option value="' + item.table + '">' + item.table + '</option>');
+            });
+
+            if (reslut.title_source) {
+                $("select[name='title_source']").val(reslut.title_source);
+            }
+
+            $.each(picData, function(index, item) {
+                $("select[name='pic_source']").append('<option value="' + item + '">' + item + '</option>');
+            });
+
+            if (reslut.pic_source) {
+                $("select[name='pic_source']").val(reslut.pic_source);
+            }
+
+            template_selector.update({ data: templateData, autoRow: true });
+
+            keyword_selector.update({ data: keywordData, autoRow: true });
+
+            $("#v_cache_class").val(reslut.cache_option.cache_type);
+
+
+            layui.form.render('select');
+        } catch (error) {
+            console.error("Error initializing data:", error);
+        } finally {
+            // 关闭加载动画
+            layer.closeAll("loading");
+        }
+    }
+    // 调用初始化函数
+    initializeData();
+
+    $("select[name='tdk_encode']").find("option[value='<?php echo($data['seo_option']['tdk_encode']); ?>']").prop("selected",true);
+
+
+    // layui.element.on('tab(edit-project-tab)', function(data){
+    //     $(".layui-tab-item").each(function (item) {
+    //         $(this).removeClass('layui-show');
+    //         if(item === data.index){
+    //             $(this).addClass('layui-show');
+    //         }
+    //     });
+    //
+    //     $('.layui-tab-content').css('height', 'auto');
+    // });
+
+    layui.form.on('submit(project-edit)',function(data){
+        var _data = data.field;
+        $.post("{:U('platform/project/table?action=edit&sid=')}{$Think.get.sid}",_data,function (res) {
+            console.log(res)
+            if(res.code == 200){
+                layer.msg(res.msg, {time:2000,icon: 6},function(){
+                    parent.document.location.reload();
+                });
+            }else{
+                alert(res.msg);
+                return false;
+            }
+        })
+        return false;
+    })
+</script>

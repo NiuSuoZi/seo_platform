@@ -1,0 +1,170 @@
+<extend name="Public:base"/>
+<block name="title">消息通知 - 站点管理</block>
+<block name="content">
+    <div class="page-header"><h1> 站点管理 &gt; 消息通知</h1></div>
+    <div class="col-xs-12">
+        <form class="layui-form" action="{:U('platform/project/notification')}" method="post">
+            <fieldset style="margin-top: 50px;">
+                <legend>Telegram 设置</legend>
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 10%">Telegram 推送</label>
+                <div class="layui-input-block">
+                    <?php if($data['telegram_status'] == 0):?>
+                    <input type="radio" name="telegram_status" value="on" title="开启" checked><div class="layui-unselect layui-form-radio"><div>开启</div></div>
+                    <input type="radio" name="telegram_status" value="off" title="关闭"><div class="layui-unselect layui-form-radio layui-form-radioed"><div>关闭</div></div>
+                    <?php else:?>
+                    <input type="radio" name="telegram_status" value="on" title="开启"><div class="layui-unselect layui-form-radio"><div>开启</div></div>
+                    <input type="radio" name="telegram_status" value="off" title="关闭" checked><div class="layui-unselect layui-form-radio layui-form-radioed"><div>关闭</div></div>
+                    <?php endif;?>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 10%">Telegram Api Key</label>
+                <div class="layui-input-block">
+                    <input type="text" name="telegram_keys"  placeholder="Telegram Bot API Keys" value="<?php echo($data['telegram_keys']);?>" autocomplete="off" class="layui-input" style="width: 30%">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 10%">Telegram ChatID</label>
+                <div class="layui-input-block">
+                    <input type="text" name="telegram_chatid"  placeholder="Telegram ChatID" value="<?php echo($data['telegram_chatid']);?>" autocomplete="off" class="layui-input" style="width: 30%">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="button" name="message-test" data-type="0" class="layui-btn layui-btn-radius layui-btn-normal layui-btn-xs">发送Telegram测试消息</button>
+                </div>
+            </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>CloudChat 设置</legend>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 10%">CloudChat 推送</label>
+                <div class="layui-input-block">
+                    <?php if($data['cloudchat_status'] == 0):?>
+                    <input type="radio" name="cloudchat_status" value="on" title="开启" checked><div class="layui-unselect layui-form-radio"><div>开启</div></div>
+                    <input type="radio" name="cloudchat_status" value="off" title="关闭"><div class="layui-unselect layui-form-radio layui-form-radioed"><div>关闭</div></div>
+                    <?php else:?>
+                    <input type="radio" name="cloudchat_status" value="on" title="开启"><div class="layui-unselect layui-form-radio"><div>开启</div></div>
+                    <input type="radio" name="cloudchat_status" value="off" title="关闭" checked><div class="layui-unselect layui-form-radio layui-form-radioed"><div>关闭</div></div>
+                    <?php endif;?>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 10%">ChatCloud API Key</label>
+                <div class="layui-input-block">
+                    <input type="text" name="cloudchat_keys"  placeholder="ChatCloud Bot API KEYS" value="<?php echo($data['cloudchat_keys']);?>" autocomplete="off" class="layui-input" style="width: 30%">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 10%">ChatCloud ChatID</label>
+                <div class="layui-input-block">
+                    <input type="number" name="chatcloud_chatid"  placeholder="ChatCloud ChatID" value="<?php echo($data['cloudchat_chatid']);?>"autocomplete="off" class="layui-input" style="width: 30%">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="button" data-type="1" name="message-test" class="layui-btn layui-btn-radius layui-btn-normal layui-btn-xs">发送ChatCloud测试消息</button>
+                </div>
+            </div>
+
+            </fieldset>
+
+            <fieldset>
+                <legend>飞书 设置</legend>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 10%">飞书 推送</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="feishu_status" value="on" title="开启"><div class="layui-unselect layui-form-radio"><div>开启</div></div>
+                    <input type="radio" name="feishu_status" value="off" title="关闭" checked=""><div class="layui-unselect layui-form-radio layui-form-radioed"><div>关闭</div></div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 10%">飞书 API</label>
+                <div class="layui-input-block">
+                    <input type="text" name="feishu_keys"  placeholder="飞书 Bot KEYS" autocomplete="off" class="layui-input" style="width: 30%">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="button" data-type="2" name="message-test" class="layui-btn layui-btn-radius layui-btn-normal layui-btn-xs">发送飞书测试消息</button>
+                </div>
+            </div>
+            </fieldset>
+            <fieldset>
+                <legend>钉钉 设置</legend>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 10%">钉钉 推送</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="dingding_status" value="on" title="开启"><div class="layui-unselect layui-form-radio"><div>开启</div></div>
+                    <input type="radio" name="dingding_status" value="off" title="关闭" checked=""><div class="layui-unselect layui-form-radio layui-form-radioed"><div>关闭</div></div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 10%">钉钉 API</label>
+                <div class="layui-input-block">
+                    <input type="text" name="dingding_keys"  placeholder="钉钉机器人 API" autocomplete="off" class="layui-input" style="width: 30%">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="button" data-type="3" name="message-test" class="layui-btn layui-btn-radius layui-btn-normal layui-btn-xs">发送钉钉测试消息</button>
+                </div>
+            </div>
+            </fieldset>
+            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
+                <legend>邮件 设置</legend>
+            </fieldset>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label" style="width: 10%">E-mail 推送</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="email_status" value="on" title="开启"><div class="layui-unselect layui-form-radio"><div>开启</div></div>
+                    <input type="radio" name="email_status" value="off" title="关闭" checked=""><div class="layui-unselect layui-form-radio layui-form-radioed"><div>关闭</div></div>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"  style="width: 10%">E-mail 地址</label>
+                <div class="layui-input-block">
+                    <input type="text" name="email_addr"  placeholder="E-mail 接收地址" autocomplete="off" class="layui-input" style="width: 30%">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="button" data-type="4" name="message-test" class="layui-btn layui-btn-normal layui-btn-xs">发送E-Mail测试邮件</button>
+                </div>
+            </div>
+            <hr/>
+            <br/>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="formDemo">保存</button>
+                </div>
+            </div>
+        </form>
+        </div>
+</block>
+<block name="js">
+    <script>
+        $("button[name='message-test']").on('click',function(){
+            type = $(this).attr('data-type');
+            $.post("{:U('platform/project/notification?act=test')}",{type:type},function (result) {
+                console.log(result);
+            })
+        });
+    </script>
+</block>

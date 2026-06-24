@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <logincss />
+    <jquery />
+    <script src="https://cdn.staticfile.org/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <title>绑定你的Google验证器 - SEO Work Platform System V 2.5</title>
+    <meta name="keyword" content="seo工作平台,seo Platform,黑帽seo,白帽seo,灰帽seo" />
+    <meta name="description" content="适用于网站优化工作人员" />
+    <meta name="author" content="X37 Team Inc." />
+</head>
+<body>
+<div class="login-page bounce">
+    <div class="form">
+        <h3>请绑定你的Google验证器，并记牢它！</h3>
+        <hr />
+        <form class="login-form" method="POST" action="{:U('login/index/sign_code')}">
+            <input
+                    type="text" placeholder="用户名" value="<?php echo($login_uns);?>" disabled />
+            <input
+                    type="text" title="私钥" name="ga_secret" placeholder="验证码 Verify Code" value="<?php echo($secret);?>" disabled />
+            {__TOKEN__} <br />
+            <div id="qrcode"></div>
+            <br />
+            <button>
+                <b title="绑定验证器">Binding verifier</b>
+            </button>
+        </form>
+        <p class="message">Tips:请保存私钥或扫描二维码到谷歌验证器（浏览器插件下载<a href="https://chrome.google.com/webstore/detail/authenticator/bhghoamapcdpbohphigoooaddinpkbai?utm_source=chrome-ntp-icon" target="_blank">Chrome</a>或<a href="https://addons.mozilla.org/zh-CN/firefox/addon/auth-helper/?utm_source=addons.mozilla.org&utm_medium=referral&utm_content=search" target="_blank">FireFox</a>)</p>
+    </div>
+</div>
+<script type="text/javascript">
+    jQuery('#qrcode').qrcode({width: 268,height: 232,text: "<?php echo($qrcode_base64_images);?>"});
+    $(function(){
+        $('form').submit(function(event) {
+            if($("input[name='ga_secret']").val() !== ''){
+                if(!confirm('请牢记你的秘钥并已经安全的存储它，该操作不可还原？')){
+                    return false;
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

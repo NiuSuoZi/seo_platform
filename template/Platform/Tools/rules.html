@@ -1,0 +1,63 @@
+<extend name="Public:base"/>
+<block name="title">UrlWrite 二级目录重写生成</block>
+<block name="content">
+    <div class="page-header">
+        <h1> <i class="fa fa-cog icon-test"></i>&nbsp;辅助工具 &gt; 二级目录重写生成</h1>
+    </div>
+    <div class="col-xs-12">
+        <div class="">
+            <form class="form-inline" action="{:U('platform/tools/rules')}" method="post" role="form" id="form_type">
+                <div style="width: 10%;" class="form-group">
+                    <select name="rules_types" title="选择一个蜘蛛开始模拟..." style="width: 100%;">
+                        <option value="0">.htaccess</option>
+                        <option value="1">ISAPI 3</option>
+                        <option value="2">Nginx</option>
+                        <option value="3">Web.config</option>
+                        <option value="4">.INI</option>
+                    </select>
+                </div>
+                <div style="width: 69%;" class="form-group">
+                    <input type="text" name="rules_url" id="robot_url" style="width: 100%;height:31px;text-align: center" value="<?php if(!empty($_POST['rules_url'])){echo htmlspecialchars($_POST['rules_url']);}?>" placeholder="客户端Url" title="客户端相对路径">
+                </div>
+                <div style="width: 8%;" class="form-group">
+                    <select name="robot_model" title="选择模拟模式" style="width: 100%;">
+                        <option value="0">重写首页</option>
+                        <option value="1">不重写首页</option>
+                    </select>
+                </div>
+                <div style="width: 12%;" class="form-group">
+                    <button title="开始模拟" id="submit" type="submit" class="btn btn-small btn-primary" style="height: 30px;width: 100%;line-height: 2px;font-family: Microsoft YaHei;margin-left: 2px;">一键生成</button>
+                </div>
+                {__TOKEN__}
+            </form>
+        </div>
+        <br/>
+        <textarea id="spider_source" class="form-control resizable processed" rows="31" style="height: 580px;" title="源代码模式" readonly><empty name="rules_contents">等待生成任务...<else />{$rules_contents}</empty></textarea>
+    </div>
+    </div>
+</block>
+<block name="js">
+    <script type="text/javascript" charset="utf-8">
+        $(document).keyup(function(event){
+            if(event.keyCode ==13){
+                $("#submit").trigger("click");
+            }
+        });
+        var Expression=/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+        var objExp=new RegExp(Expression);
+
+        $("form").submit(function(e){
+            var input_text = $('#robot_url').val();
+            if($('#robot_url').val() ==+ ''){
+                alert('输入URL后再生成!');
+                return false;
+            }else if(objExp.test(input_text) != true){
+                alert('请检查是否输入正确的URL!!');
+                return false;
+            }else{
+                $("#spider_source").html("正在生成...");
+            }
+        });
+    </script>
+</block>
+</block>

@@ -1,0 +1,218 @@
+<extend name="Public:base"/>
+<block name="title">站群管理 - 站点列表</block>
+<block name="content">
+    <div class="page-header"><h1> 站群管理 &gt; 站点列表</h1></div>
+    <style>
+        .operate-menu {
+            min-width: 120px; /* 控制菜单宽度 */
+            padding: 5px 0;
+            border-radius: 4px; /* 圆角样式 */
+            box-shadow: none; /* 去除下拉阴影 */
+            border: 1px solid #ddd; /* 边框颜色 */
+        }
+
+        .operate-menu li a {
+            font-size: 12px; /* 调整字体大小 */
+            padding: 5px 10px; /* 调整内边距，适配小尺寸按钮 */
+            display: flex; /* 支持图标和文字对齐 */
+            align-items: center;
+        }
+
+        .operate-menu li a i {
+            margin-right: 6px; /* 图标与文字的间距 */
+            font-size: 12px; /* 缩小图标大小 */
+        }
+
+        .operate-menu .divider {
+            margin: 4px 0; /* 分割线间距 */
+            height: 1px;
+            background-color: #ddd;
+        }
+    </style>
+    <div class="col-xs-12">
+        <div class="tabbable">
+            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab">
+                <li class="<empty name='currentCategoryId'>active</empty>">
+                    <a href="{:U('platform/website/management')}">所有分类</a>
+                </li>
+                <volist name="CategoryList" id="item">
+                    <li class="<eq name='currentCategoryId' value='$item.category_id'>active</eq>">
+                        <a href="{:U('platform/website/management', array('category_id' => $item['category_id']))}">
+                            {$item.category_name}
+                        </a>
+                    </li>
+                </volist>
+            </ul>
+            <div class="tab-content" style="padding: 20px;">
+                <div class="clearfix toolbar" style="margin-bottom: 15px; position: relative;">
+                    <empty name='currentCategoryId'>
+                        <div class="pull-right">
+                            <button class="btn btn-xs btn-primary" style="margin-right: 10px;"
+                                    onclick="createCategory()">
+                                <i class="ace-icon fa fa-folder"></i> 新建分类
+                            </button>
+                            <button class="btn btn-xs btn-primary" style="margin-right: 10px;" onclick="add()">
+                                <i class="ace-icon fa fa-plus-circle"></i> 添加站点
+                            </button>
+                            <button class="btn btn-xs btn-info" onclick="searchEntries()">
+                                <i class="ace-icon fa fa-search"></i> 搜索域名
+                            </button>
+                        </div>
+                    </empty>
+                    <div class="drawer"
+                         style="position: absolute; top: 50px; right: 0; width: 300px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: none;">
+                        <div style="padding: 10px; font-size: 14px;">
+                            <h4 style="margin: 0 0 10px;">快速操作</h4>
+                            <button class="btn btn-xs btn-warning" style="width: 100%; margin-bottom: 10px;"
+                                    onclick="quickAdd()">快速添加
+                            </button>
+                            <button class="btn btn-xs btn-success" style="width: 100%;" onclick="quickSearch()">
+                                快速搜索
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th style="text-align: center;">站群名称</th>
+                        <th style="text-align: center;">包含域名数</th>
+                        <th style="text-align: center;">类别关键词</th>
+                        <th style="text-align: center;">站群分类</th>
+                        <th style="text-align: center;">类别模板</th>
+                        <th style="text-align: center;">缓存总数</th>
+                        <th style="text-align: center;">编辑时间</th>
+                        <th style="text-align: center;">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <notempty name="WebsiteLists.data">
+                        <volist name="WebsiteLists.data" id="website">
+                            <tr>
+                                <td style="text-align: center;">{$website.display_name}</td>
+                                <td style="text-align: center;">{:count(unserialize($website['bind_domains']))}</td>
+                                <td style="text-align: center;">{$website.category_keyword}</td>
+                                <td style="text-align: center;">{$website.category_name}</td>
+                                <td style="text-align: center;">{$website.category_template}</td>
+                                <td style="text-align: center;">0</td>
+                                <td style="text-align: center;">{:word_time($website['lastedite_time'])}</td>
+                                <td style="text-align: center;">
+                                    <div class="dropdown">
+                                        <button class="btn btn-minier btn-primary dropdown-toggle" type="button"
+                                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                            更多
+                                            <i class="ace-icon fa fa-caret-down"></i>
+                                        </button>
+                                        <ul class="operate-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+                                            <li>
+                                                <a href="javascript:;" id="edit-item" name="edit-item" data-mid="{$website.id}">
+                                                    <i class="ace-icon fa fa-pencil-alt"></i> 编辑
+                                                </a>
+                                            </li>
+<!--                                            <li class="divider"></li>-->
+                                            <li>
+                                                <a href="javascript:;" id="delete-item" data-mid="{$website.id}" class="text-danger">
+                                                    <i class="ace-icon fa fa-trash-alt"></i> 删除
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </volist>
+                        <else/>
+                        <tr>
+                            <td colspan="8" class="text-center" style="color: #FF5722; font-weight: bold;">
+                                暂时还没有数据~
+                            </td>
+                        </tr>
+                    </notempty>
+                    </tbody>
+                </table>
+                <div class="text-center" style="margin-top: 20px;">
+                    {$WebsiteLists.page}
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+
+<block name="js">
+    <script src="__PUBLIC__/statics/xm-select/xm-select.js"></script>
+    <script>
+
+        layui.use(['element', 'layer'], function () {
+            var element = layui.element;
+            var layer = layui.layer;
+        });
+
+        $("a[id='edit-item']").on('click',function (s){
+            let mid = $(this).attr('data-mid');
+            layer.open({
+                type: 2,
+                title: '修改配置',
+                content: '{:U("platform/website/siteedit?mid=")}' + mid,
+                area: ['70%', '80%'],
+                maxWidth: '650px',
+                shadeClose: true
+            });
+        });
+        
+        $("a[id='delete-item']").on('click', function() {
+            let mid = $(this).attr('data-mid');
+            layer.confirm('确定要删除此记录吗？', {
+                icon: 3,
+                title: '删除确认'
+            }, function(index) {
+                $.ajax({
+                    url: '{:U("platform/website/sitedelete")}',
+                    type: 'POST',
+                    data: { mid: mid },
+                    dataType: 'json',
+                    success: function(response) {
+                        if(response.status == 1) {
+                            layer.msg('删除成功！', {icon: 1});
+                            // 可根据需要刷新页面或删除对应的DOM节点
+                            location.reload();
+                        } else {
+                            layer.msg('删除失败：' + response.info, {icon: 2});
+                        }
+                    },
+                    error: function() {
+                        layer.msg('请求失败，请稍后重试！', {icon: 2});
+                    }
+                });
+                layer.close(index);
+            });
+        });
+
+        function searchEntries() {
+            layer.msg('搜索按钮被点击');
+            // 在这里添加你的逻辑
+        }
+
+        function add() {
+            layer.open({
+                type: 2,
+                title: '添加网站',
+                content: '{:U("platform/website/siteadd")}',
+                area: ['70%', '80%'],
+                maxWidth: '650px',
+                shadeClose: true
+            });
+        }
+
+        function createCategory() {
+            layer.open({
+                type: 2,
+                title: '新建分类',
+                content: '{:U("platform/website/createCategory")}',
+                area: ['500px', '300px'],
+                shadeClose: true
+            });
+        }
+
+
+    </script>
+</block>

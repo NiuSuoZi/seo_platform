@@ -1,0 +1,82 @@
+<extend name="Public:base"/>
+<block name="title"><?php $types = $_GET['types']; if($types == '') : echo ('全部列表'); ?><?php else:?><?php echo($list[$types]); ?><?php endif;?> - 昨日蜘蛛爬行统计</block>
+<block name="content">
+    <div class="page-header">
+        <h1> 首页&gt; 昨日蜘蛛爬行统计</h1>
+    </div>
+    <div class="col-xs-12">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue">
+            <?php $types = $_GET['types']; ?>
+            <li id="all_list" <?php if(empty($types)): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_yesterday')}">全部列表</a></li>
+            <li id="baiduspider" <?php if($types == 1): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_yesterday','types=1')}">百度蜘蛛</a></li>
+            <li id="sogouspider" <?php if($types == 2): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_yesterday','types=2')}">搜狗蜘蛛</a></li>
+            <li id="haosouspider" <?php if($types == 3): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_yesterday','types=3')}">360蜘蛛</a></li>
+            <li id="bingspider" <?php if($types == 4): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_yesterday','types=4')}">必应蜘蛛</a></li>
+            <li id="googlespider" <?php if($types == 5): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_yesterday','types=5')}">谷歌蜘蛛</a></li>
+            <li id="smspider" <?php if($types == 6): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_yesterday','types=6')}">神马蜘蛛</a></li>
+            <li id="yandexspider" <?php if($types == 7): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_yesterday','types=7')}">Yandex蜘蛛</a></li>
+            <li id="coccocspider" <?php if($types == 8): echo("class=\"active\""); ?>  <?php endif;?>> <a href="{:U('Platform/Spider/show_yesterday','types=8')}">Coccoc蜘蛛</a></li>
+            <li id="naverspider" <?php if($types == 9): echo("class=\"active\""); ?> <?php endif;?>> <a href="{:U('Platform/Spider/show_yesterday','types=9')}">Naver蜘蛛</a></li>
+        </ul>
+        <div class="tabbable">
+            <div class="tab-content">
+                                <table class="table table-bordered table-hover">
+                        <tr>
+                            <th>爬行域名</th>
+                            <th>爬行 User-Agent</th>
+                            <th>爬行URI</th>
+                            <th>爬行类型</th>
+                            <th>来源 IP</th>
+                            <th>首次访问</th>
+                            <th>爬行时间</th>
+                        </tr>
+                        <?php if(!empty($data)) : ?>
+                        <?php foreach($data as $key=>$value) : ?>
+                       <tr>
+                            <td><a href="javascript:;" name="domain"><?php echo($data[$key]['spider_domain']);?></a></td>
+                            <td><b class="blue"><?php echo(get_spider($data[$key]['spider_types']));?></b></td>
+                            <td><a href="javascript:;" title="点击访问" name="urls"><?php echo($data[$key]['spider_url']);?></a></td>
+                            <td><?php echo($data[$key]['types']);?></td>
+                           <td>
+                               <?php if (empty($data[$key]['ip_source'])): ?>
+                               空
+                               <?php else: ?>
+                               <code><?php echo(extractIpAddresses($data[$key]['ip_source'])); ?></code>
+                               <?php endif; ?>
+                           </td>
+                           <td><?php if($data[$key]['spider_first'] == 1): ?><b class="red">是</b><?php else:?><b class="green">否</b><?php endif;?></td>
+                            <td><b class="grey"><?php echo(word_time($data[$key]['spider_times']));?></b></td>
+                        </tr>
+                        <?php endforeach;?>
+                        <?php else:?>
+                            <td colspan="7" class="center"><b class="red">未找到昨天的相关数据!</b></td>
+                        <?php endif;?>
+                    </tbody>
+                </table>
+                <nav style="text-align: center">
+                {$page}
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="show-domain-info" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times;</button>
+                    <h4 class="modal-title" id="myModalLabel">域名信息</h4>
+                </div>
+                <div class="modal-body">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script type="text/javascript">
+        $("a[name='domain']").click(function(event) {
+                $("#show-domain-info").modal('show');
+        });
+    </script>
+</block>

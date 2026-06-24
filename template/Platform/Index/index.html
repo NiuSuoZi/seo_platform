@@ -1,0 +1,319 @@
+<extend name="Public:base" />
+<block name="title">平台首页</block>
+<block name="content">
+<div class="page-header">
+	<h1>
+		<i class="fa fa-home"></i> 首页
+	</h1>
+</div>
+	<style>
+		fieldset {
+			margin: 0;
+			padding: 0;
+			border: 0;
+		}
+
+		/* Default styles for .infobox */
+		.infobox {
+			margin: 10px; /* Adjust the value as needed */
+			/* Other default styles */
+		}
+
+		/* Media query for smaller screens (adjust the max-width as needed) */
+		@media (max-width: 768px) {
+			.infobox {
+				margin: 5px; /* Adjust the value for smaller screens */
+				/* Other styles for smaller screens */
+			}
+		}
+	</style>
+	<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+	<div class="col-xs-12">
+	<!-- 百度 -->
+	<div class="row">
+		<div class="alert alert-block alert-success">
+			<button type="button" class="close" data-dismiss="alert">
+				<i class="ace-icon fa fa-times"></i>
+			</button>
+			<i class="ace-icon fa fa-check green"></i>
+			欢迎使用
+			<strong class="green">
+				Jackie SEO工作平台
+				<small>(v{$license.version})</small>
+			</strong>
+			, 兼容九大搜索引擎，高度集成黑帽SEO所有手法 内部实现站点论链，互链，可视化后台管理，系统级劫持等独有功能.
+		</div>
+		<?php if(Sys_SecurityCheck() !== true):?>
+		<div class="alert alert-block alert-warning">
+			<button type="button" class="close" data-dismiss="alert">
+				<i class="ace-icon fa fa-times"></i>
+			</button>
+			<i class="ace-icon fa fa-warning red"></i>
+				<?php echo(Sys_SecurityCheck());?>
+		</div>
+		<?php endif;?>
+		<fieldset>
+			<legend>今日蜘蛛统计</legend>
+					<!-- 内容区域 -->
+					<div class="layui-container">
+						<!-- 左侧蜘蛛统计 -->
+						<div class="spider-stats">
+							<div class="spider-container">
+								<div class="spider-item">
+									<img src="__PUBLIC_IMAGES__/spider-logo/baidu.png" alt="百度">
+									<span class="spider-text">百度</span>
+									<span class="spider-count" id="total-1">0</span>
+								</div>
+								<div class="spider-item">
+									<img src="__PUBLIC_IMAGES__/spider-logo/google.png" alt="Google">
+									<span class="spider-text">Google</span>
+									<span class="spider-count" id="total-5">0</span>
+								</div>
+								<div class="spider-item">
+									<img src="__PUBLIC_IMAGES__/spider-logo/sogou.png" alt="搜狗">
+									<span class="spider-text">搜狗</span>
+									<span class="spider-count" id="total-2">0</span>
+								</div>
+								<div class="spider-item">
+									<img src="__PUBLIC_IMAGES__/spider-logo/s360.png" alt="360蜘蛛">
+									<span class="spider-text">360搜索</span>
+									<span class="spider-count" id="total-3">0</span>
+								</div>
+								<div class="spider-item">
+									<img src="__PUBLIC_IMAGES__/spider-logo/bing.png" alt="必应">
+									<span class="spider-text">必应</span>
+									<span class="spider-count" id="total-4">0</span>
+								</div>
+								<div class="spider-item">
+									<img src="__PUBLIC_IMAGES__/spider-logo/shenma.png" alt="神马">
+									<span class="spider-text">神马</span>
+									<span class="spider-count" id="total-6">0</span>
+								</div>
+								<div class="spider-item">
+									<img src="__PUBLIC_IMAGES__/spider-logo/yandex.png" alt="Yandex">
+									<span class="spider-text">Yandex</span>
+									<span class="spider-count" id="total-7">0</span>
+								</div>
+								<div class="spider-item">
+									<img src="__PUBLIC_IMAGES__/spider-logo/coccoc.png" alt="Cốc Cốc">
+									<span class="spider-text">Cốc Cốc</span>
+									<span class="spider-count" id="total-8">0</span>
+								</div>
+								<div class="spider-item">
+									<img src="__PUBLIC_IMAGES__/spider-logo/naver.png" alt="Naver">
+									<span class="spider-text">Naver</span>
+									<span class="spider-count" id="total-9">0</span>
+								</div>
+							</div>
+							</div>
+					</div>
+		</fieldset>
+		<fieldset style="margin-top: 20px;">
+			<legend>今日蜘蛛数据图表</legend>
+			<div class="layui-row">
+				<div class="layui-col-md6">
+					<div id="pie-chart" class="chart-container"></div>
+				</div>
+				<!-- 折线图 -->
+				<div class="layui-col-md6">
+					<div id="line-chart" class="chart-container"></div>
+				</div>
+			</div>
+<!--			<div class="spider-chart" style="display: flex; justify-content: space-between; flex-wrap: wrap;">-->
+<!--				&lt;!&ndash; 图表 1 &ndash;&gt;-->
+<!--				<div class="col-md-4 spider-chart-total" style="flex: 1; margin-right: 20px;">-->
+<!--					<div id="pie-chart" class="chart-container"></div>-->
+<!--				</div>-->
+
+<!--				&lt;!&ndash; 图表 2 &ndash;&gt;-->
+<!--				<div class="col-md-6 chart-data" style="flex: 1;">-->
+<!--					<div id="line-chart" class="chart-container"></div>-->
+<!--				</div>-->
+<!--			</div>-->
+		</fieldset>
+		<div class="widget-box transparent">
+			<div class="widget-header widget-header-flat">
+				<h4 class="widget-title lighter">
+					系统信息
+				</h4>
+
+				<div class="widget-toolbar">
+<!--					<a href="#" data-action="collapse">-->
+<!--						<i class="ace-icon fa fa-chevron-up"></i>-->
+<!--					</a>-->
+				</div>
+			</div>
+
+			<div class="widget-body">
+				<div class="widget-main no-padding">
+					<table class="table table-bordered table-striped">
+						<thead class="thin-border-bottom">
+						</thead>
+
+						<tbody>
+						<tr>
+							<td>系统环境</td>
+
+							<td>
+								<b><?php echo(php_uname('a')); ?> </b>
+							</td>
+						</tr>
+						<tr>
+							<td>授权用户</td>
+							<td>
+								<b>{$Think.server.server_name}</b>
+							</td>
+						</tr>
+						<tr>
+							<td>主控端程序版本</td>
+							<td>
+								<b>v{$license.version} {$license.type} {$license.date}</b>
+							</td>
+						</tr>
+						<tr>
+							<td>内容端程序版本</td>
+							<td>
+								<b>v6.2.1 release 202307</b>
+							</td>
+						</tr>
+						<tr>
+							<td>内容端状态</td>
+							<td>
+								<?php if($center):?><b class="green">Yes</b><?php else:?><b class="red">No</b><?php endif;?>
+							</td>
+						</tr>
+						<tr>
+							<td>缓存总占用</td>
+							<td>
+								<?php if($getStorage === false):?><b class="red">获取失败，检查是否和内容端正常通讯！</b><?php else:?><b class="grey"><?php echo(formatFileSize($getStorage));?></b><?php endif;?>
+							</td>
+						</tr>
+						<tr>
+							<td>PHP 运行模式</td>
+
+							<td>
+								<b><?php echo(PHP_VERSION);?> / <?php echo(php_sapi_name());?></b>
+							</td>
+						</tr>
+
+						<tr>
+							<td>WEB 容器</td>
+
+							<td>
+								<b><?php echo($_SERVER['SERVER_SOFTWARE']);?></b>
+							</td>
+						</tr>
+						</tbody>
+					</table>
+				</div><!-- /.widget-main -->
+			</div><!-- /.widget-body -->
+		</div><!-- /.widget-box -->
+	</div><!-- /.col -->
+</block>
+
+<block name="js">
+	<script>
+
+
+		function formatThousands(num) {
+			return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+		}
+
+		var scale = {};
+
+		// 使用 AJAX 请求获取数据
+		$.get("{:U('Platform/index/index?act=total')}", function (total) {
+			// 遍历蜘蛛的访问次数并更新页面
+			$.each(total.total, function (index, value) {
+				$("#total-" + value.spider_types).text(formatThousands(value.count));
+			});
+
+			// 更新总访问量
+			$("#total-all").text(formatThousands(total.all));
+
+			var lineChart = echarts.init(document.getElementById('line-chart'));
+			lineChart.setOption({
+				tooltip: { trigger: 'axis' },
+				legend: {
+					data: ['百度', '搜狗', '360搜索', '神马', '谷歌', '必应','Yandex','Cocococ','Naver'],
+					// top: '15%', // 将图例向下偏移，避免与标题重叠
+					left: 'center',
+					textStyle: {
+						fontSize: 14,
+					}
+				},
+				xAxis: { type: 'category', data: total.line.hours },
+				yAxis: { type: 'value' },
+				series: [
+					{ name: '百度', type: 'line', data: total.line.hourly.baidu },
+					{ name: '搜狗', type: 'line', data: total.line.hourly.sogou },
+					{ name: '360搜索', type: 'line', data: total.line.hourly.so360 },
+					{ name: '神马', type: 'line', data: total.line.hourly.shenma },
+					{ name: '必应', type: 'line', data: total.line.hourly.bing },
+					{ name: '谷歌', type: 'line', data: total.line.hourly.google },
+					{ name: 'Yandex', type: 'line', data: total.line.hourly.yandex },
+					{ name: 'Cocococ', type: 'line', data: total.line.hourly.coccoc },
+					{ name: 'Naver', type: 'line', data: total.line.hourly.yeti }
+				]
+			});
+
+
+			// 处理蜘蛛访问数据
+			const scale = {
+				'baidu': parseInt($("#total-1").text().replace(/,/g, '')),
+				'sogou': parseInt($("#total-2").text().replace(/,/g, '')),
+				'haosou': parseInt($("#total-3").text().replace(/,/g, '')),
+				'shenma': parseInt($("#total-6").text().replace(/,/g, '')),
+				'google': parseInt($("#total-5").text().replace(/,/g, '')),
+				'bing': parseInt($("#total-4").text().replace(/,/g, '')),
+				'yandex': parseInt($("#total-7").text().replace(/,/g, '')),
+				'coccoc': parseInt($("#total-8").text().replace(/,/g, '')),
+				'yeti': parseInt($("#total-9").text().replace(/,/g, ''))
+			};
+
+			// 绘制饼图（蜘蛛访问比例）
+			const pieChart = echarts.init(document.getElementById("pie-chart"));
+			const pieOption = {
+				title: {
+					text: '蜘蛛访问比例',
+					left: 'center'
+				},
+				tooltip: {
+					trigger: 'item',
+					formatter: '{b}: {c} 次 ({d}%)'
+				},
+				legend: {
+					orient: 'vertical',
+					left: 'right',
+					data: ["百度蜘蛛", "搜狗蜘蛛", "360蜘蛛", "神马蜘蛛", "Google蜘蛛", "Bing蜘蛛", "Yandex蜘蛛", "CoCCoc蜘蛛", "Yeti蜘蛛"]
+				},
+				series: [{
+					type: 'pie',
+					radius: '50%',
+					data: [
+						{ value: scale.baidu, name: '百度蜘蛛' },
+						{ value: scale.sogou, name: '搜狗蜘蛛' },
+						{ value: scale.haosou, name: '360蜘蛛' },
+						{ value: scale.shenma, name: '神马蜘蛛' },
+						{ value: scale.google, name: 'Google蜘蛛' },
+						{ value: scale.bing, name: 'Bing蜘蛛' },
+						{ value: scale.yandex, name: 'Yandex蜘蛛' },
+						{ value: scale.coccoc, name: 'CoCCoc蜘蛛' },
+						{ value: scale.yeti, name: 'Yeti蜘蛛' }
+					],
+					emphasis: {
+						itemStyle: {
+							shadowBlur: 10,
+							shadowOffsetX: 0,
+							shadowColor: 'rgba(0, 0, 0, 0.5)'
+						}
+					},
+					label: {
+						formatter: '{b}: {c} 次'
+					}
+				}]
+			};
+			pieChart.setOption(pieOption);
+		});
+	</script>
+</block>

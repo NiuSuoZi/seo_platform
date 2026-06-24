@@ -1,0 +1,66 @@
+<extend name="Public:base"/>
+<block name="title">在线蜘蛛模拟</block>
+<block name="content">
+    <div class="page-header">
+        <h1> <i class="fa fa-cog icon-test"></i>&nbsp;辅助工具 &gt; 在线蜘蛛模拟</h1>
+    </div>
+    <div class="col-xs-12">
+        <div class="">
+            <form class="form-inline" action="{:U('platform/tools/robot')}" method="post" role="form" id="form_type">
+                <div style="width: 10%;" class="form-group">
+                <select name="robot_type" title="选择一个蜘蛛开始模拟..." style="width: 100%;">
+                    <option value="0">360PC端蜘蛛模拟</option>
+                    <option value="1">360移动端蜘蛛模拟</option>
+                    <option value="2">百度PC端蜘蛛模拟</option>
+                    <option value="3">百度移动端蜘蛛模拟</option>
+                    <option value="4">搜狗PC端蜘蛛模拟</option>
+                    <option value="5">搜狗移动端蜘蛛模拟</option>
+                    <option value="6">神马移动端模拟</option>
+                    <option value="7">正常访问</option>
+                </select>
+                </div>
+                <div style="width: 69%;" class="form-group">
+                    <input type="text" name="robot_url" id="robot_url" style="width: 100%;height:31px;text-align: center" value="<?php if(!empty($_POST['robot_url'])){echo htmlspecialchars($_POST['robot_url']);}?>" placeholder="请输入待抓取的URL..." title="输入URL模拟">
+                </div>
+                <div style="width: 8%;" class="form-group">
+                     <select name="robot_model" title="选择模拟模式" style="width: 100%;">
+                        <option value="0">源码模式</option>
+                        <option value="1">快照模式</option>
+                     </select>
+                </div>
+                <div style="width: 12%;" class="form-group">
+                    <button title="开始模拟" id="submit" type="submit" class="btn btn-small btn-primary" style="height: 30px;width: 100%;line-height: 2px;font-family: Microsoft YaHei;margin-left: 2px;">模拟抓取</button>
+               </div>
+               {__TOKEN__}
+            </form>
+        </div>
+        <br/>
+                <textarea id="spider_source" class="form-control resizable processed" rows="31" style="height: 580px;" title="源代码模式" readonly><empty name="data">等待抓取任务...<else />{$data}</empty></textarea>
+        </div>
+    </div>
+</block>
+<block name="js">
+    <script type="text/javascript" charset="utf-8"> 
+        $(document).keyup(function(event){
+            if(event.keyCode ==13){
+                $("#submit").trigger("click");
+            }
+        });
+        var Expression=/http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+        var objExp=new RegExp(Expression);
+
+        $("form").submit(function(e){
+            var input_text = $('#robot_url').val();
+            if($('#robot_url').val() ==+ ''){
+                alert('输入URL后进行模拟!');
+                return false;
+            }else if(objExp.test(input_text) != true){
+                alert('请检查是否输入正确的URL!!');
+                return false;
+            }else{
+                $("#spider_source").html("正在抓取...");
+            }
+        });
+    </script>
+</block>
+</block>

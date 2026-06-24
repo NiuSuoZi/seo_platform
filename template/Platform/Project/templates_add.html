@@ -1,0 +1,224 @@
+<link href="__ADMIN_ACEADMIN__/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet"
+      href="__ADMIN_ACEADMIN__/css/font-awesome.min.css" />
+<link rel="stylesheet"
+      href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" />
+<!--[if IE 7]>
+<link rel="stylesheet" href="__ADMIN_ACEADMIN__/css/font-awesome-ie7.min.css" />
+<![endif]-->
+<link rel="stylesheet" href="__PUBLIC__/statics/bootstrap-3.3.5/css/bootstrap-multiselect.min.css" />
+
+<link rel="stylesheet" href="__ADMIN_ACEADMIN__/css/ace.min.css" />
+<link rel="stylesheet" href="__ADMIN_ACEADMIN__/css/ace-skins.min.css"/>
+<!--[if lte IE 8]>
+<link rel="stylesheet" href="__ADMIN_ACEADMIN__/css/ace-ie.min.css" />
+<![endif]-->
+<!--[if lt IE 9]>
+<script src="__ADMIN_ACEADMIN__/js/html5shiv.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/respond.min.js"></script>
+<![endif]-->
+<jquery/>
+<codemirrorcss/>
+<div class="col-xs-12">
+        <jquery/>
+        <codemirrorcss/>
+        <codemirrorjs/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inconsolata">
+        <style>
+            .CodeMirror {
+                font-family: Inconsolata, monospace;
+                font-size: 20px;
+            }
+        </style>
+
+    <div class="col-xs-offset-1">
+        <ul class="list-inline" style="text-align:center;">
+            <li><a href="javascript:;" id="preview" title="预览">预览</a></li>
+            <li><a href="javascript:;" id="save" title="保存">保存</a></li>
+            <li><a href="https://www.evernote.com/l/AhATv__d-UlO_Jrr5vJv37AFoM7GMX8Xpd4/" id="helper" target="_blank" title="模板标签助手">模板标签助手</a></li>
+            <li><a href="javascript:;" title="自动识别标签">自动识别标签</a></li>
+            <li><a href="javascript:;" id="get-remote-template" title="模拟抓取模板">模拟抓取模板</a></li>
+            <li><a href="javascript:;" title="布局检测">布局检测</a></li>
+            <li><a href="javascript:;" id="code_format" title="代码格式化(Beta)">代码格式化(Beta)</a></li>
+        </ul>
+    </div>
+    <div class="col-xs-offset-1 form-inline">
+        <div style="width: 90%;" class="form-group">
+            <input type="text" name="template_name" id="template_name" style="width: 100%;height:31px;text-align: center" placeholder="请输入模板名字..." title="请输入模板名字">
+        </div>
+    </div>
+        <br/>
+        <textarea id="source" class="form-control resizable processed" rows="30">无论什么方式只要写上html代码即可</textarea>
+    </div>
+    <script>
+
+
+
+        // https://www.evernote.com/l/AhATv__d-UlO_Jrr5vJv37AFoM7GMX8Xpd4/
+
+        // 模拟抓取模板 view
+        var zz_info;
+        var info;
+        $("#get-remote-template").click(function(){
+            zz_info = layer.open({
+                type: 1,
+                skin: 'layui-layer-rim', //加上边框
+                title: '模拟蜘蛛抓取模板',
+                area: ['587px', '97px'], //宽高
+                content: '\n' +
+                    '<div class="input-group">\n' +
+                    '\n' +
+                    '<input id="uri" type="text" class="form-control search-query" placeholder="请输入待抓取的URI" />\n' +
+                    '<span class="input-group-btn">\n' +
+                    '<button type="button" class="btn btn-inverse btn-white" onclick="get_remote()">\n' +
+                    '<span class="ace-icon fa fa-search icon-on-right bigger-110"></span>\n' +
+                    'Got!\n' +
+                    '</button>\n' +
+                    '</span>\n' +
+                        '\n' +
+                    '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t</div>'
+
+            });
+        });
+
+        var editor = CodeMirror.fromTextArea(document.getElementById("source"), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            theme : 'yonce',
+            extraKeys: { "Tab": "autocomplete" },
+        });
+
+        editor.setSize('auto', '680px');
+        editor.setOption('lineWrapping', true);
+
+
+        function getSelectedRange() {
+            return { from: editor.getCursor(true), to: editor.getCursor(false) };
+        }
+
+
+        $("#code_format").click(function(){
+            // 代码格式化
+            var range = getSelectedRange();
+            editor.autoFormatRange(range.from, range.to);
+        });
+
+        // 抓取模板 action
+
+        function get_remote() {
+            uris = $("#uri").val();
+            if (uris === '') {
+                layer.msg('请输入uri后继续！');
+                return false;
+            }
+
+            var Urlregx = /(http|https)+:\/\/[^\s]*/;
+            o = Urlregx.test(uris);
+            if(!o){
+                layer.msg('输入的uri格式不对！');
+                return false;
+            }
+
+            info = layer.msg('正在抓取，请稍后...',{icon:16,time:1000});
+
+            $.post("{:U('Platform/project/templates_add?action=get-remote')}", {url: uris}, function(data, textStatus, xhr) {
+                if(data.code === 200){
+                    layer.close(info);
+                    layer.msg('抓取成功~',{icon:1,time:1000},function(){
+                        layer.close(zz_info)
+                    });
+                    editor.setValue(data.html);
+                }
+
+                if(data.code === 500){
+                    layer.msg(data.msg);
+                    return false;
+                }
+            });
+
+        }
+
+        $("#save").click(function(){
+            console.log('保存模板');
+            content = editor.getValue();
+            tname = $("#template_name").val();
+            type = $("#template_model").val();
+
+            data = {
+                content : content,
+                name : tname,
+                type : type
+            };
+
+            $.ajax({
+                url:'{:U("platform/project/templates_add?action=save")}',
+                type:'POST',
+                data:data,
+                success:function (data) {
+                    if(data.code === 404){
+                        layer.msg(data.msg,{icon:0,time:1000});
+                    }
+
+                    if(data.code === 200){
+                        layer.msg(data.msg,{icon:1,time:1500},function(){
+                            // 关闭页面
+                        });
+                    }
+                }
+            })
+
+        });
+
+        // 新窗口预览代码
+        $("#preview").click(function(){
+            var source = editor.getValue();
+            var winname = window.open('', "_blank", '');
+            winname.document.open('text/html', 'replace');
+            winname.opener = null; // 防止代码对论谈页面修改
+            winname.document.write(source);
+            winname.document.close();
+        });
+        function htmlspecialchars(str) {
+            var s = "";
+            if (str.length == 0) return "";
+            for   (var i=0; i<str.length; i++)
+            {
+                switch (str.substr(i,1))
+                {
+                    case "<": s += "&lt;"; break;
+                    case ">": s += "&gt;"; break;
+                    case "&": s += "&amp;"; break;
+                    case " ":
+                        if(str.substr(i + 1, 1) == " "){
+                            s += " &nbsp;";
+                            i++;
+                        } else s += " ";
+                        break;
+                    case "\"": s += "&quot;"; break;
+                    default: s += str.substr(i,1); break;
+                }
+            }
+            return s;
+        }
+    </script>
+
+<script src="__ADMIN_ACEADMIN__/js/typeahead-bs2.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/bootstrap.min.js"></script>
+<!-- page specific plugin scripts -->
+
+<!--[if lte IE 8]>
+<script src="__ADMIN_ACEADMIN__/js/excanvas.min.js"></script>
+<![endif]-->
+<script src="https://cdn.bootcdn.net/ajax/libs/layer/3.1.1/layer.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/jquery-ui-1.10.3.custom.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/jquery.ui.touch-punch.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/jquery.slimscroll.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/jquery.easy-pie-chart.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/jquery.sparkline.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/flot/jquery.flot.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/flot/jquery.flot.pie.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/flot/jquery.flot.resize.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/ace-elements.min.js"></script>
+<script src="__ADMIN_ACEADMIN__/js/ace.min.js"></script>
+<script src="__PUBLIC_JS__/base.js"></script>
