@@ -1759,6 +1759,107 @@ function Api($route = '', $param = array()){
     return $response;
 }
 
+/**
+ * 从内容端拉取词库表列表（带 Redis 缓存校验）
+ */
+function platform_keyword_list($refresh = false)
+{
+    if (!$refresh) {
+        $cache = S('keyword_list');
+        if (is_array($cache) && !isset($cache['code']) && !empty($cache) && isset($cache[0]['table'])) {
+            return $cache;
+        }
+        if ($cache) {
+            S('keyword_list', null);
+        }
+    }
+
+    $html = Api('keyword/list', []);
+    $list = is_string($html) ? json_decode($html, true) : [];
+    if (is_array($list) && !isset($list['code']) && !empty($list) && isset($list[0]['table'])) {
+        S('keyword_list', $list);
+        return $list;
+    }
+
+    return [];
+}
+
+/**
+ * 词库下拉选项；$type = nor 普通(不含 seo_tl) | tl 仅 seo_tl
+ */
+function platform_keyword_options($list, $type = 'nor')
+{
+    $data = [];
+    if (!is_array($list)) {
+        return $data;
+    }
+
+    foreach ($list as $value) {
+        if (!is_array($value) || empty($value['table'])) {
+            continue;
+        }
+        $table = $value['table'];
+        $isTl = strpos($table, 'seo_tl') !== false;
+        if ($type === 'tl') {
+            if (!$isTl) {
+                continue;
+            }
+        } elseif ($isTl) {
+            continue;
+        }
+        $data[] = [
+            'name' => $table,
+            'value' => $table,
+        ];
+    }
+
+    return array_values($data);
+}
+
+/**
+ * 模板列表下拉选项
+ */
+function platform_template_options($refresh = false)
+{
+    if (!$refresh) {
+        $cache = S('template_cache');
+        if (is_array($cache) && isset($cache['data']) && is_array($cache['data']) && !isset($cache['code'])) {
+            $normal = $cache['data'];
+        } else {
+            $normal = null;
+            if ($cache) {
+                S('template_cache', null);
+            }
+        }
+    } else {
+        $normal = null;
+    }
+
+    if (!isset($normal)) {
+        $response = Api('tpl/list');
+        $list = is_string($response) ? json_decode($response, true) : [];
+        if (is_array($list) && isset($list['data']) && is_array($list['data']) && !isset($list['code'])) {
+            S('template_cache', $list);
+            $normal = $list['data'];
+        } else {
+            $normal = [];
+        }
+    }
+
+    $options = [];
+    foreach ($normal as $value) {
+        if (empty($value['name'])) {
+            continue;
+        }
+        $options[] = [
+            'name' => $value['name'],
+            'value' => $value['name'],
+        ];
+    }
+
+    return $options;
+}
+
 // 百度收录查询
 function baidu($site = ''){
     $BAIDUID = createRandomStr(18,false,false);

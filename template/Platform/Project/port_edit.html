@@ -730,7 +730,7 @@
     // 获取已配置的项目数据
     function fetchConfiguredData() {
       return $.ajax({
-        url: "{:U('platform/project/port_edit?kwa=1&cid=')}<?php echo(intval($_GET['cid']));?>",
+        url: "{:U('Platform/Project/port_edit?kwa=1&cid=')}<?php echo(intval($_GET['cid']));?>",
         type: "GET",
         dataType: "json"
       });
@@ -901,11 +901,26 @@
 
         // 获取并处理源数据
         const sourceData = await fetchSourceData();
-        const contentData = JSON.parse(sourceData.data.content);
-        const picData = JSON.parse(sourceData.data.pic);
-        const templateData = sourceData.data.template;
-        const keywordData = sourceData.data.keyword;
-        const rulesData = sourceData.data.rules;
+        if (!sourceData || sourceData.code !== 200 || !sourceData.data) {
+          layer.msg('加载内容端数据失败，请检查 control 连接与词库', {icon: 2});
+          return;
+        }
+
+        const contentData = typeof sourceData.data.content === 'string'
+          ? JSON.parse(sourceData.data.content)
+          : sourceData.data.content;
+        const picData = typeof sourceData.data.pic === 'string'
+          ? JSON.parse(sourceData.data.pic)
+          : sourceData.data.pic;
+        const templateData = sourceData.data.template || [];
+        const keywordData = sourceData.data.keyword || [];
+        const rulesData = sourceData.data.rules || [];
+
+        if (!keywordData.length) {
+          layer.msg(keyword_model
+            ? '当前为 TL 类型，仅显示 seo_tl 词表；泰语词库 seo_th 请切换为「普通类型」'
+            : '词库列表为空，请先在内容端执行 deploy_th_locale 并清理 Platform 缓存', {icon: 0, time: 5000});
+        }
 
         // 渲染 article 选择框
         $.each(contentData.article, function(index, item) {

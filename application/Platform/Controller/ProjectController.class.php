@@ -891,18 +891,14 @@ class ProjectController extends PlatformBaseController
 
     public function keyword(){
         $action = I('get.action');
-        $list = S('keyword_list');
-        if(!is_array($list) || isset($list['code']) || empty($list) || !isset($list[0]['table'])) {
-            if ($list) {
-                S('keyword_list', null);
+        $list = platform_keyword_list();
+        if ($action === 'list' && IS_AJAX) {
+            $data = [];
+            foreach ($list as $key => $value) {
+                $data[$key]['name'] = $value['table'];
+                $data[$key]['value'] = $value['table'];
             }
-            $html = Api('keyword/list',[]);
-            $list = is_string($html) ? json_decode($html, true) : [];
-            if (is_array($list) && !isset($list['code']) && !empty($list) && isset($list[0]['table'])) {
-                S('keyword_list', $list);
-            } else {
-                $list = [];
-            }
+            $this->ajaxReturn(['data' => $data, 'code' => 200]);
         }
 
         if(empty($list)){
@@ -911,16 +907,6 @@ class ProjectController extends PlatformBaseController
             exit;
         }
 
-        // if($action == 'list' && IS_AJAX){
-        if($action == 'list' && IS_AJAX){
-            // ajax获取
-            foreach ($list as $key=>$value){
-                $data[$key]['name'] = $value['table'];
-                $data[$key]['value'] = $value['table'];
-            }
-
-            $this->ajaxReturn(['data'=>$data,'code'=>200]);
-        }
         // 查看队列ID
         if($action == 'queue' && IS_AJAX && IS_POST){
             $queue_id = I('post.queue_id');
@@ -929,6 +915,7 @@ class ProjectController extends PlatformBaseController
             if($queue['message'] === 'ok'){
                 // 清除缓存
                 S('keyword_list',null);
+                platform_keyword_list(true);
             }
             $this->ajaxReturn($queue);
         }
