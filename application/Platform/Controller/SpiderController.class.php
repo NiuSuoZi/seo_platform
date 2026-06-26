@@ -26,9 +26,28 @@ class SpiderController extends PlatformBaseController
         }
         $SpiderModel = new \Common\Model\SpiderLogModel();
         $dump = $SpiderModel->select_today($spider);
-         // echo $SpiderModel->getLastSql();
-        //var_dump($dump['data']);
-        // echo $dump['page'];
+        $count = array(
+            'baidu' => 0,
+            'sogou' => 0,
+            '360' => 0,
+            'bing' => 0,
+            'google' => 0,
+            'sm' => 0,
+            'total' => 0,
+        );
+        foreach ($SpiderModel->getAllCount() as $row) {
+            $n = (int)$row['count'];
+            switch ((int)$row['spider_types']) {
+                case 1: $count['baidu'] += $n; break;
+                case 2: $count['sogou'] += $n; break;
+                case 3: $count['360'] += $n; break;
+                case 4: $count['bing'] += $n; break;
+                case 5: $count['google'] += $n; break;
+                case 6: $count['sm'] += $n; break;
+            }
+            $count['total'] += $n;
+        }
+
         $list = array(
             1 => '百度蜘蛛',
             2 => '搜狗蜘蛛',
@@ -40,22 +59,6 @@ class SpiderController extends PlatformBaseController
             8 => 'Coccoc蜘蛛',
             9 => 'Naver蜘蛛'
         );
-
-
-        $count = array(
-            'baidu' => empty(S('log_baiduspider_count')) ? 0 : S('log_baiduspider_count'),
-            'sogou' =>empty(S('log_sogouspider_count')) ? 0 : S('log_sogouspider_count'),
-            '360' => empty(S('log_360spider_count')) ? 0 : S('log_360spider_count'),
-            'bing' => empty(S('log_bingbot_count')) ? 0 : S('log_bingbot_count'),
-            'google' => empty(S('log_googlebot_count')) ? 0 : S('log_googlebot_count'),
-            'sm' => empty(S('log_smspider_count')) ? 0 : S('log_smspider_count'),
-        );
-        $total = 0;
-        foreach ($count as $value){
-            $total += $value;
-        }
-        $count['total'] = $total;
-
         $this->assign('count',$count);
         $this->assign('data',$dump['data']);
         $this->assign('list',$list);

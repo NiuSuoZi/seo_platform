@@ -1445,21 +1445,32 @@ function geetest_chcek_verify($data){
 }
 
 function chenk_urls($urls){
+    if (!is_string($urls) || $urls === '') {
+        return false;
+    }
+    // 支持泰语等非 ASCII 路径（规则页 slug）
+    if (preg_match('#^https?://[^\s?#]+#iu', $urls)) {
+        return true;
+    }
     $url_preg = "/(?:(?:https|http|ftp|rtsp|mms):\/\/|\s|^|[^a-zA-Z])((?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,8})(\/[a-zA-Z0-9#%&\'\(\)\*\+,\.\/:\<\=\>\?@\[\]\^_`\|\\~\-]+)?/i";
     if(preg_match_all($url_preg,$urls,$return_url)){
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 function chenk_domain($domain){
+    if (!is_string($domain) || $domain === '') {
+        return false;
+    }
+    if (preg_match('/^(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,24}$/', $domain)) {
+        return true;
+    }
     $domain_preg = "/(?:(?:https|http|ftp|rtsp|mms):\/\/|\s|^|[^a-zA-Z])((?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,8})(\/[a-zA-Z0-9#%&\'\(\)\*\+,\.\/:\<\=\>\?@\[\]\^_`\|\\~\-]+)?/i";
     if(preg_match_all($domain_preg,$domain,$return_url)){
         return true;
-    }else{
-        return false;
     }
+    return false;
 }
 
 function chenk_cached($cache_name){

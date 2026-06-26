@@ -13,10 +13,7 @@ class SpiderLogModel extends AdvModel {
         array('spider_types','1,2,3,4,5,6,7,8,9','types error',2,'in'),
         array('spider_url','chenk_urls','url is not.',0,'function'),
         array('spider_domain','chenk_domain','domain is error.',0,'function'),
-        array('spider_cached','chenk_cached','cache name is error',0,'function'),
         array('types','require','types is error.'),
-        array('uuid','require','types is uuid.'),
-        array('spider_kt','require','types is error.'),
     );
 
     public function __construct($name = '', $tablePrefix = '', $connection = '')
